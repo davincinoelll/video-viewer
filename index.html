@@ -58,19 +58,18 @@ nav.solid{background:rgba(16,13,11,.94);backdrop-filter:blur(14px) saturate(130%
 .links button:hover{color:var(--txt)}
 .links button.on{color:var(--txt)}
 .links button.on::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;
-  border-radius:2px;background:var(--amber);box-shadow:0 0 12px var(--glow);animation:grow .3s var(--ease)}
-@keyframes grow{from{transform:scaleX(0)}}
+  border-radius:2px;background:var(--amber);box-shadow:0 0 12px var(--glow)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:9px}
 .iconbtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;
   background:rgba(255,238,220,.06);border:1px solid transparent;transition:.2s var(--ease)}
-.iconbtn:hover{background:rgba(255,238,220,.13);border-color:var(--line2);transform:translateY(-1px)}
+.iconbtn:hover{background:rgba(255,238,220,.13);border-color:var(--line2)}
 .iconbtn.off{opacity:.45}
 .avatar{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:13px;
   background:linear-gradient(145deg,var(--amber),var(--amber2));color:#241a12}
 
 #volpop{position:fixed;top:60px;right:4%;z-index:120;background:rgba(36,28,23,.97);
   border:1px solid var(--line2);border-radius:14px;padding:12px 14px;display:none;
-  box-shadow:0 20px 50px rgba(0,0,0,.6);backdrop-filter:blur(12px)}
+  box-shadow:0 20px 50px rgba(0,0,0,.6)}
 #volpop.on{display:block}
 #volpop label{font-size:11px;color:var(--dim);display:block;margin-bottom:7px;letter-spacing:.05em}
 #volpop input{width:150px;accent-color:var(--amber)}
@@ -120,7 +119,6 @@ main{padding:0 0 40px;position:relative;z-index:2;margin-top:-5vh}
 .card .art{position:relative;border-radius:var(--r);overflow:hidden;background:var(--card);
   box-shadow:0 6px 18px rgba(0,0,0,.5);cursor:pointer;
   border:1px solid rgba(255,238,220,.06);transition:box-shadow .3s var(--ease),border-color .3s}
-/* padding-driven 2:3 box — no aspect-ratio dependency, cannot collapse */
 .card .art::before{content:"";display:block;padding-bottom:150%}
 .card:hover .art{box-shadow:0 16px 40px -14px rgba(0,0,0,.85),0 0 0 1px rgba(243,168,107,.4),
   0 0 34px -8px var(--glow);border-color:rgba(243,168,107,.35)}
@@ -144,7 +142,6 @@ main{padding:0 0 40px;position:relative;z-index:2;margin-top:-5vh}
 .card:hover .kill{opacity:1}
 .card .kill:hover{background:var(--bad);border-color:var(--bad);color:#241a12}
 
-/* hover preview: instant still, trailer fades over it */
 .card .prev{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;opacity:0;
   pointer-events:none;transition:opacity .38s var(--ease);background:#0a0806;z-index:2}
 .card .prev.on{opacity:1}
@@ -181,6 +178,7 @@ main{padding:0 0 40px;position:relative;z-index:2;margin-top:-5vh}
 
 .rowfail{display:flex;align-items:center;gap:10px;padding:6px 4%;color:var(--dim);font-size:13px}
 .rowfail button{padding:5px 13px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--txt)}
+.rowfail button:hover{background:var(--amber);color:#241a12;border-color:var(--amber)}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:14px 9px;padding:16px 4% 20px}
 .grid .card{width:auto}
@@ -197,7 +195,7 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 .empty{text-align:center;padding:100px 20px;color:var(--dim);font-size:14px}
 .empty b{display:block;color:var(--txt);font-family:Georgia,serif;font-size:20px;margin-bottom:8px}
 .morewrap{display:flex;justify-content:center;padding:8px 4% 50px}
-.count{font-size:12px;color:var(--dim2);padding:0 4%}
+.count{font-size:12px;color:var(--dim2)}
 .greet{padding:104px 4% 0;font-size:13px;color:var(--dim2);letter-spacing:.05em;text-transform:uppercase}
 
 #scrim{position:fixed;inset:0;background:rgba(8,6,5,.8);backdrop-filter:blur(5px);z-index:200;
@@ -210,7 +208,6 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px var(--line);
   transform:translateY(24px) scale(.985);transition:.4s var(--ease)}
 #modal.on .sheet{transform:none}
-/* hero: 16:9 frame + body in normal flow, so long titles never clip */
 .hero{position:relative;background:#0a0806}
 .hero .frame{position:relative;padding-bottom:56.25%;overflow:hidden}
 .hero .frame > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -347,13 +344,6 @@ const store = (() => {
   };
 })();
 
-function timeoutSignal(ms) {
-  try { if (AbortSignal && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms); } catch {}
-  const c = new AbortController();
-  setTimeout(() => { try { c.abort(); } catch {} }, ms);
-  return c.signal;
-}
-
 /* ── ASMR sound ──────────────────────────────────────────── */
 const SFX = (() => {
   const AC = window.AudioContext || window.webkitAudioContext;
@@ -448,7 +438,7 @@ const SFX = (() => {
     tone(jit(660,.1), .06, { type:"triangle", gain:.014 }); }
   function hover() { const t = performance.now(); if (t - lastHover < 90) return; lastHover = t;
     air({ dur:.3, freq:jit(600,.2), q:.7, gain:.022, attack:.07 }); }
-  function whoosh(up) { air({ dur:.44, freq: up ? 300 : 1500, q:.7, gain:.06, attack:.09 }); }
+  function whoosh() { air({ dur:.44, freq:300, q:.7, gain:.06, attack:.09 }); }
   function chime(up) { if (!ready()) return;
     [up ? 784 : 587, up ? 1175 : 440].forEach((f,i) => setTimeout(() => tone(f,.5,{type:"triangle",gain:.04}), i*70)); }
   function thud() { tone(124,.24,{to:58,gain:.075}); air({dur:.09,freq:400,q:.8,gain:.045,type:"lowpass"}); }
@@ -475,8 +465,6 @@ addEventListener("keydown", () => SFX.boot(), { once:true });
 /* ── sources ─────────────────────────────────────────────── */
 const CM      = "https://v3-cinemeta.strem.io";
 const METAHUB = "https://images.metahub.space";
-const APIBAY  = "https://apibay.org";
-const YTS     = "https://movies-api.accel.li/api/v2/list_movies.json";
 
 const DIRECT = { id:"direct", fn:u => u };
 const RELAYS = [
@@ -484,10 +472,8 @@ const RELAYS = [
   { id:"allorigins", fn:u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
   { id:"codetabs", fn:u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) }
 ];
-const TRACKERS = ["udp://tracker.opentrackr.org:1337/announce","udp://open.demonii.com:1337/announce",
-  "udp://tracker.openbittorrent.com:6969/announce","udp://exodus.desync.com:6969/announce"];
 
-/* players issue a host-bound gate token, so every frame sends a Referer */
+/* every player frame sends a Referer — they gate on it */
 const SERVERS = [
   { name:"VidSrc", kind:"imdb",
     m:id=>`https://vidsrc.sh/embed/movie/${id}?autoplay=1`,
@@ -514,7 +500,6 @@ const SERVERS = [
 
 const GENRES = ["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama",
   "Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western"];
-const S_GENRES = GENRES.concat(["Reality-TV","Talk-Show","Game-Show"]);
 const DECADES = ["2020s","2010s","2000s","1990s","1980s","1970s","1960s","1950s","1940s"];
 const Y = new Date().getFullYear();
 const decadeYears = d => { const s = +d.slice(0,4), out = [];
@@ -524,9 +509,6 @@ const decadeYears = d => { const s = +d.slice(0,4), out = [];
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const isEl = n => n instanceof Element;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const bytes = n => { n=+n||0; const u=["B","KB","MB","GB","TB"]; let i=0; while(n>=1024&&i<4){n/=1024;i++;} return n.toFixed(i?1:0)+" "+u[i]; };
-const magnet = (h,n) => "magnet:?xt=urn:btih:"+h+"&dn="+encodeURIComponent(n||"")+TRACKERS.map(t=>"&tr="+encodeURIComponent(t)).join("");
-const qOf = s => (/2160p|4k|uhd/i.test(s)?"2160p":/1080p/i.test(s)?"1080p":/720p/i.test(s)?"720p":/480p|dvdrip/i.test(s)?"480p":"");
 const yearOf = it => (it.releaseInfo || it.year || "").toString().slice(0,4);
 const pctOf = it => it.imdbRating ? Math.round(parseFloat(it.imdbRating) * 10) : 0;
 const minsOf = rt => { const n = parseInt(String(rt||"").replace(/\D+/g,""), 10); return n > 0 ? n : 0; };
@@ -571,24 +553,40 @@ function upsertCont(item, season, episode, epIndex) {
   saveCont(l); renderContinue();
 }
 
-/* ── transport ───────────────────────────────────────────── */
-let directOK = null;
+/* ── transport: capped concurrency, direct host cools off ── */
+let active = 0; const q = [];
+function enqueue(fn) { return new Promise((res, rej) => { q.push({ fn, res, rej }); pump(); }); }
+function pump() {
+  while (active < 4 && q.length) {
+    const it = q.shift(); active++;
+    it.fn().then(it.res, it.rej).finally(() => { active--; pump(); });
+  }
+}
+function timeoutSignal(ms) {
+  try { if (AbortSignal && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms); } catch {}
+  const c = new AbortController();
+  setTimeout(() => { try { c.abort(); } catch {} }, ms);
+  return c.signal;
+}
+let directDownUntil = 0;
 const cache = new Map();
 async function getJSON(url, tries = 2) {
   if (cache.has(url)) return cache.get(url);
-  const routes = directOK === false ? RELAYS : [DIRECT, ...RELAYS];
+  const direct = Date.now() > directDownUntil;
+  const routes = direct ? [DIRECT, ...RELAYS] : RELAYS;
   let err;
   for (let a = 0; a < tries; a++) for (const r of routes) {
+    const isDirect = r.id === "direct";
     try {
-      const res = await fetch(r.fn(url), { signal: timeoutSignal(r.id === "direct" ? 7000 : 14000) });
+      const res = await fetch(r.fn(url), { signal: timeoutSignal(isDirect ? 7000 : 14000) });
       if (!res.ok) throw new Error(res.status);
       const j = await res.json();
-      directOK = r.id === "direct"; cache.set(url, j); return j;
-    } catch (e) { if (r.id === "direct") directOK = false; err = e; }
+      if (isDirect) directDownUntil = 0;
+      cache.set(url, j); return j;
+    } catch (e) { if (isDirect) directDownUntil = Date.now() + 45000; err = e; }
   }
   throw err || new Error("unreachable");
 }
-/* extras go after the catalog id, joined with & */
 const catUrl = (type, cat, extras = []) =>
   `${CM}/catalog/${type}/${cat}.json` + (extras.length ? "/" + extras.join("&") : "");
 
@@ -612,7 +610,7 @@ function card(o, opts = {}) {
         <div class="r">${p?`<span class="match">${p}%</span>`:""}<span>${esc(yearOf(o))}</span>
           <span>${type==="series"?"Series":"Film"}</span></div>
         <div class="acts2">
-          <button data-play="${esc(o.id)}" data-ptype="${type}" title="Play">▶</button>
+          <button data-play="${esc(o.id)}" data-ptype="${type}" title="Play now">▶</button>
           <button data-open="${esc(o.id)}" data-ot="${type}" title="Details">ⓘ</button>
           <button data-fav="${esc(o.id)}" title="My List">★</button>
         </div>
@@ -644,16 +642,16 @@ function hidePreview() {
 async function runPreview(c, id, type) {
   const box = c.querySelector(".prev"); if (!box) return;
   const seed = itemCache.get(id) || {};
-  const coarse = matchMedia && matchMedia("(pointer:coarse)").matches;
   const still = seed.background || seed.poster || "";
   if (still) {
     const im = document.createElement("img");
     im.className = "still"; im.referrerPolicy = "no-referrer"; im.src = still;
     box.appendChild(im); box.classList.add("on");
   }
+  if (matchMedia && matchMedia("(pointer:coarse)").matches) return;
   let m = seed;
   try { m = { ...seed, ...(await getJSON(`${CM}/meta/${type}/${id}.json`, 1)).meta }; } catch {}
-  if (pvId !== id || coarse) return;
+  if (pvId !== id) return;
   const tr = (m.trailers || []).find(x => x && x.source);
   if (!tr) return;
   const f = document.createElement("iframe");
@@ -685,65 +683,87 @@ function view(html) { $("#main").innerHTML = html; }
 const greet = () => { const h = new Date().getHours();
   return h < 5 ? "Up late" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
-/* every row is a distinct catalog query — the library is the sum of them */
+/* each row pulls three depths deep, so rows actually fill */
 const HOME = [
-  ["Trending Now","movie",[{}]],
-  ["Popular Series","series",[{}]],
-  ["New Releases","movie",[{cat:"year",genre:String(Y)},{cat:"year",genre:String(Y-1)}]],
-  ["New Series","series",[{cat:"year",genre:String(Y)},{cat:"year",genre:String(Y-1)}]],
-  ["Top Rated Films","movie",[{cat:"imdbRating"}]],
-  ["Top Rated Series","series",[{cat:"imdbRating"}]],
-  ...GENRES.map(g => [g,"movie",[{genre:g}]]),
-  ...["Action","Comedy","Crime","Drama","Mystery","Sci-Fi","Thriller","Romance"].map(g => [`${g} Series`,"series",[{genre:g}]]),
-  ["Films of the 2020s","movie",[{cat:"year",genre:String(Y-1)},{cat:"year",genre:String(Y-2)}]],
-  ["Films of the 2010s","movie",[{cat:"year",genre:"2016"},{cat:"year",genre:"2013"}]],
-  ["Films of the 2000s","movie",[{cat:"year",genre:"2006"},{cat:"year",genre:"2003"}]],
-  ["Films of the 1990s","movie",[{cat:"year",genre:"1996"},{cat:"year",genre:"1993"}]],
-  ["Films of the 1980s","movie",[{cat:"year",genre:"1986"},{cat:"year",genre:"1983"}]],
-  ["Series of the 2010s","series",[{cat:"year",genre:"2016"},{cat:"year",genre:"2013"}]],
-  ["Series of the 2000s","series",[{cat:"year",genre:"2006"},{cat:"year",genre:"2003"}]]
+  ["Trending Now","movie",[{d:[0,60,140,240]}]],
+  ["Popular Series","series",[{d:[0,60,140,240]}]],
+  ["New Releases","movie",[{cat:"year",genre:String(Y),d:[0,60]},{cat:"year",genre:String(Y-1),d:[0,60]}]],
+  ["New Series","series",[{cat:"year",genre:String(Y),d:[0,60]},{cat:"year",genre:String(Y-1),d:[0,60]}]],
+  ["Top Rated Films","movie",[{cat:"imdbRating",d:[0,60]},{d:[0,120]}]],
+  ["Top Rated Series","series",[{cat:"imdbRating",d:[0,60]},{d:[0,120]}]],
+  ...GENRES.map(g => [g,"movie",[{genre:g,d:[0,60,140]}]]),
+  ...["Action","Comedy","Crime","Drama","Mystery","Sci-Fi","Thriller","Romance"].map(g => [`${g} Series`,"series",[{genre:g,d:[0,60]}]]),
+  ["Films of the 2020s","movie",[{cat:"year",genre:String(Y-1),d:[0,60]},{cat:"year",genre:String(Y-2),d:[0,60]}]],
+  ["Films of the 2010s","movie",[{cat:"year",genre:"2016",d:[0,60]},{cat:"year",genre:"2012",d:[0,60]}]],
+  ["Films of the 2000s","movie",[{cat:"year",genre:"2006",d:[0,60]},{cat:"year",genre:"2002",d:[0,60]}]],
+  ["Films of the 1990s","movie",[{cat:"year",genre:"1996",d:[0,60]},{cat:"year",genre:"1992",d:[0,60]}]],
+  ["Films of the 1980s","movie",[{cat:"year",genre:"1986",d:[0,60]},{cat:"year",genre:"1982",d:[0,60]}]],
+  ["Series of the 2010s","series",[{cat:"year",genre:"2016",d:[0,60]},{cat:"year",genre:"2012",d:[0,60]}]]
 ];
 
-async function fillRow(id, type, steps) {
-  const el = document.getElementById(id); if (!el) return;
+async function fillRow(el, type, steps) {
+  const want = 30, got = [];
   for (const st of steps) {
-    try {
-      const ex = [];
-      if (st.genre) ex.push("genre=" + encodeURIComponent(st.genre));
-      const j = await getJSON(catUrl(type, st.cat || "top", ex), 1);
-      const items = (j.metas || []).filter(x => x.poster && !seenHome.has(x.id));
-      if (!items.length) continue;
-      items.forEach(x => seenHome.add(x.id));
-      el.innerHTML = items.slice(0, 24).map(x => card(x)).join("");
-      return;
-    } catch {}
+    for (const skip of (st.d || [0])) {
+      if (got.length >= want) break;
+      try {
+        const ex = [];
+        if (st.genre) ex.push("genre=" + encodeURIComponent(st.genre));
+        if (skip) ex.push("skip=" + skip);
+        const j = await enqueue(() => getJSON(catUrl(type, st.cat || "top", ex), 2));
+        for (const x of j.metas || []) {
+          if (!x.poster || seenHome.has(x.id)) continue;
+          seenHome.add(x.id); got.push(x);
+          if (got.length >= want) break;
+        }
+      } catch {}
+    }
   }
-  el.closest(".row")?.classList.add("hide");
+  if (!got.length) {
+    el.innerHTML = `<div class="rowfail"><span>Couldn't load this row.</span>
+      <button data-retry="${el.id}" data-type="${type}">Retry</button></div>`;
+    el.dataset.steps = JSON.stringify(steps);
+    return;
+  }
+  el.innerHTML = got.map(x => card(x)).join("");
 }
+
+/* rows only fetch when they near the viewport */
+const rowIO = "IntersectionObserver" in window ? new IntersectionObserver(en => {
+  for (const e of en) {
+    if (!e.isIntersecting) continue;
+    rowIO.unobserve(e.target);
+    fillRow(e.target, e.target.dataset.rtype, JSON.parse(e.target.dataset.steps));
+  }
+}, { rootMargin:"600px" }) : null;
 
 async function renderHome() {
   seenHome.clear();
   $("#bill").classList.remove("hide");
   view(`<div class="greet">${greet()} · pull up something warm</div>
     <section class="row hide" id="contRow"></section>`
-    + HOME.map(([t], i) => `<section class="row"><div class="rowhead"><h2>${esc(t)}</h2></div>
-      <div class="rail" id="r${i}">${'<div class="sk"></div>'.repeat(8)}</div></section>`).join(""));
+    + HOME.map(([t], i) => `<section class="row"><div class="rowhead"><h2>${esc(t)}</h2>
+      <button class="more" data-see="${esc(HOME[i][1])}">See all →</button></div>
+      <div class="rail" id="r${i}">${'<div class="sk"></div>'.repeat(7)}</div></section>`).join(""));
   renderContinue();
-  HOME.forEach(([, , steps], i) => {
-    if (i < 4) fillRow("r" + i, HOME[i][1], steps);
-    else setTimeout(() => fillRow("r" + i, HOME[i][1], steps), 110 * i);
+  HOME.forEach(([, type, steps], i) => {
+    const el = document.getElementById("r" + i);
+    el.dataset.rtype = type; el.dataset.steps = JSON.stringify(steps);
+    if (i < 3) fillRow(el, type, steps);
+    else if (rowIO) rowIO.observe(el);
+    else setTimeout(() => fillRow(el, type, steps), 120 * i);
   });
   billboard();
 }
 
 async function billboard() {
   try {
-    const j = await getJSON(catUrl("movie", "top"), 1);
+    const j = await enqueue(() => getJSON(catUrl("movie", "top"), 1));
     const pool = (j.metas || []).filter(x => x.background).slice(0, 10);
     if (!pool.length) return;
     const o = pool[Math.floor(Math.random() * pool.length)];
     itemCache.set(o.id, o);
-    const p = pctOf(o), cont = contList().find(c => c.id === o.id);
+    const p = pctOf(o);
     $("#bill").innerHTML = `<div class="bd" style="background-image:url('${esc(o.background)}')"></div>
       <div class="inner">
         <h1>${esc(o.name)}</h1>
@@ -752,7 +772,7 @@ async function billboard() {
           ${o.runtime?`<span>${esc(o.runtime)}</span>`:""}</div>
         <p>${esc(o.description || "")}</p>
         <div class="acts">
-          <button class="btn light" data-play="${esc(o.id)}" data-ptype="movie">▶ ${cont?"Resume":"Play"}</button>
+          <button class="btn light" data-play="${esc(o.id)}" data-ptype="movie">▶ Play</button>
           <button class="btn" data-open="${esc(o.id)}" data-ot="movie">ⓘ More info</button>
         </div>
       </div>`;
@@ -780,7 +800,7 @@ setInterval(() => {
   if (lb) lb.textContent = `${Math.round(100-pct)}% left · ${human(o.expectedMs*(1-pct/100))} remaining`;
 }, 15000);
 
-/* ── discover: paginated, deep library ───────────────────── */
+/* ── discover ────────────────────────────────────────────── */
 let bs = { type:"movie", genre:"", decade:"", sort:"popular", cursor:0, seen:new Set(), busy:false, done:false };
 
 function pageUrl(st) {
@@ -813,7 +833,7 @@ async function loadPage() {
   bs.busy = true;
   const grid = $("#bgrid"), more = $("#bmore");
   try {
-    const j = await getJSON(pageUrl(bs), 1);
+    const j = await enqueue(() => getJSON(pageUrl(bs), 2));
     const raw = (j.metas || []).filter(x => x.poster);
     const fresh = raw.filter(x => !bs.seen.has(x.id));
     fresh.forEach(x => bs.seen.add(x.id));
@@ -824,7 +844,7 @@ async function loadPage() {
       bs.done = true;
     }
     bs.cursor++;
-    if (bs.seen.size >= 600) bs.done = true;
+    if (bs.seen.size >= 900) bs.done = true;
   } catch {
     if (grid && !grid.children.length) {
       grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Couldn't load</b>
@@ -840,12 +860,13 @@ async function loadPage() {
   const r = $("#bRetry"); if (r) r.onclick = () => { bs.done = false; loadPage(); };
 }
 
-function renderBrowse(type) {
-  bs = { type, genre:"", decade:"", sort:"popular", cursor:0, seen:new Set(), busy:false, done:false };
+function renderBrowse(type, preset) {
+  bs = { type, genre:preset?.genre || "", decade:"", sort:"popular", cursor:0, seen:new Set(), busy:false, done:false };
   $("#bill").classList.add("hide");
   view(`<h3 class="page-h">${type==="movie"?"Movies":"Series"}</h3>
-    <div class="chips" id="gchips"><span class="lab">Genre</span><button class="on" data-g="">Any</button>${
-      (type === "movie" ? GENRES : S_GENRES).map(g => `<button data-g="${esc(g)}">${esc(g)}</button>`).join("")}</div>
+    <div class="chips" id="gchips"><span class="lab">Genre</span>
+      <button data-g="" class="${bs.genre?"":"on"}">Any</button>${
+      GENRES.map(g => `<button data-g="${esc(g)}" class="${bs.genre===g?"on":""}">${esc(g)}</button>`).join("")}</div>
     <div class="chips" id="dchips"><span class="lab">Era</span><button class="on" data-d="">Any</button>${
       DECADES.map(d => `<button data-d="${d}">${d}</button>`).join("")}</div>
     <div class="chips" id="schips"><span class="lab">Sort</span>
@@ -879,7 +900,7 @@ function renderBrowse(type) {
   loadPage();
 
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(en => { if (en[0].isIntersecting) loadPage(); }, { rootMargin:"700px" })
+    new IntersectionObserver(en => { if (en[0].isIntersecting) loadPage(); }, { rootMargin:"800px" })
       .observe($("#bmore"));
   }
 }
@@ -889,21 +910,11 @@ function renderList() {
   $("#bill").classList.add("hide");
   const items = myList();
   view(`<h3 class="page-h">My List</h3>
-    ${items.length ? `<div style="padding:12px 4% 0"><button class="btn sm" id="expBtn">Export list</button></div>` : ""}
     <div class="grid" id="lgrid">${items.length ? items.map(x => card(x)).join("")
       : `<div class="empty" style="grid-column:1/-1"><b>Your list is empty</b>Tap ★ on anything to keep it here.</div>`}</div>`);
-  $("#expBtn")?.addEventListener("click", () => {
-    try {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([JSON.stringify(items, null, 2)], { type:"application/json" }));
-      a.download = "reeljack-list.json"; a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      toast("List exported", "ok");
-    } catch { toast("Export failed", "err"); }
-  });
 }
 
-/* ── search: paginated ───────────────────────────────────── */
+/* ── search ──────────────────────────────────────────────── */
 function renderSearch() {
   $("#bill").classList.add("hide");
   let cursor = 0, seen = new Set(), done = false, busy = false;
@@ -915,15 +926,15 @@ function renderSearch() {
   const input = $("#sq"); input.focus();
 
   const run = async () => {
-    const q = input.value.trim();
-    if (q.length < 2 || busy || done) return;
+    const term = input.value.trim();
+    if (term.length < 2 || busy || done) return;
     busy = true;
     try {
-      const ex = ["search=" + encodeURIComponent(q)];
+      const ex = ["search=" + encodeURIComponent(term)];
       if (cursor) ex.push("skip=" + (cursor * 30));
       const [mv, sr] = await Promise.allSettled([
-        getJSON(catUrl("movie", "top", ex), 1),
-        getJSON(catUrl("series", "top", ex), 1)
+        enqueue(() => getJSON(catUrl("movie", "top", ex), 1)),
+        enqueue(() => getJSON(catUrl("series", "top", ex), 1))
       ]);
       const raw = [...(mv.status === "fulfilled" ? mv.value.metas || [] : []),
                    ...(sr.status === "fulfilled" ? sr.value.metas || [] : [])];
@@ -953,10 +964,10 @@ function renderSearch() {
 /* ── detail ──────────────────────────────────────────────── */
 let modalId, modalType, season = 1, server = 0, curMeta = null, lastUrl = "", autoTries = 0;
 
-async function openDetail(id, type) {
+async function openDetail(id, type, autoplay) {
   hidePreview();
   modalId = id; modalType = type; server = 0; autoTries = 0; lastUrl = "";
-  SFX.whoosh(true);
+  SFX.whoosh();
   $("#modal").classList.add("on");
   $("#scrim").classList.add("on");
   $("#modal").setAttribute("aria-hidden", "false");
@@ -1034,6 +1045,9 @@ async function openDetail(id, type) {
   };
   $("#selS")?.addEventListener("change", e => drawSeason(+e.target.value));
   if (seasons.length) drawSeason(rS);
+
+  /* pressing ▶ anywhere starts the video immediately */
+  if (autoplay) play(type === "series" ? rS : null, type === "series" ? rE : null);
 }
 
 function drawSeason(n) {
@@ -1107,12 +1121,11 @@ function play(s, e, auto = false) {
   $$(".ep").forEach(el => el.classList.toggle("now", +el.dataset.e === e));
 }
 
-/* a player reporting a dead title hops immediately */
 addEventListener("message", ev => {
   const d = ev.data;
-  if (!d || typeof d !== "object" || d.type !== "MEDIA_NOT_FOUND") return;
+  if (!d || typeof d !== "object" || d.type !== "MEDIA_NOT_FOUND" || !curMeta) return;
   const box = $("#playerBox");
-  if (!box || !box.querySelector("#streamFrame") || !curMeta) return;
+  if (!box || !box.querySelector("#streamFrame")) return;
   const usable = serversFor(curMeta);
   if (!usable.length || autoTries >= usable.length - 1) return;
   autoTries++;
@@ -1123,33 +1136,31 @@ addEventListener("message", ev => {
 async function loadTorrents(title, imdb) {
   const host = $("#dl"); if (!host) return;
   host.innerHTML = `<p class="kv">scraping…</p>`;
-  const cat = modalType === "series" ? "205" : "207", list = [];
+  const list = [];
   const [bay, yts] = await Promise.allSettled([
-    getJSON(`${APIBAY}/q.php?q=${encodeURIComponent(title)}&cat=${cat}`, 1),
-    getJSON(`${YTS}?limit=30&sort_by=seeds&order_by=desc&query_term=${encodeURIComponent(imdb)}`, 1)
+    getJSON(`https://apibay.org/q.php?q=${encodeURIComponent(title)}&cat=${modalType === "series" ? "205" : "207"}`, 1),
+    getJSON(`https://movies-api.accel.li/api/v2/list_movies.json?limit=30&sort_by=seeds&order_by=desc&query_term=${encodeURIComponent(imdb)}`, 1)
   ]);
   if (bay.status === "fulfilled" && Array.isArray(bay.value))
     for (const x of bay.value) {
       if (!x.info_hash || x.id === "0") continue;
-      list.push({ name:x.name, hash:x.info_hash, size:x.size, seeds:+x.seeders, q:qOf(x.name) });
+      list.push({ n:x.name, h:x.info_hash, s:+x.size, sd:+x.seeders });
     }
   if (yts.status === "fulfilled")
     for (const m of yts.value?.data?.movies || []) for (const tt of m.torrents || [])
-      list.push({ name:`${m.title_long} [${tt.quality}]`, hash:tt.hash, size:tt.size_bytes, seeds:+tt.seeds, q:tt.quality });
+      list.push({ n:`${m.title_long} [${tt.quality}]`, h:tt.hash, s:+tt.size_bytes, sd:+tt.seeds });
   const seen = new Set();
-  const rows = list.filter(x => x.hash && !seen.has(x.hash) && seen.add(x.hash))
-    .sort((a,b) => b.seeds - a.seeds).slice(0, 40);
+  const rows = list.filter(x => x.h && !seen.has(x.h) && seen.add(x.h)).sort((a,b) => b.sd - a.sd).slice(0, 40);
+  const TR = ["udp://tracker.opentrackr.org:1337/announce","udp://open.demonii.com:1337/announce"];
   host.innerHTML = rows.length
-    ? rows.map(r => `<div class="trow"><span class="q">${esc(r.q || "—")}</span>
-        <span class="sz">${esc(bytes(r.size))} · ${esc(r.name.slice(0,58))}</span>
-        <span class="sd">▲ ${r.seeds}</span>
-        <button data-m="${esc(magnet(r.hash, r.name))}">Magnet</button></div>`).join("")
-    : `<p class="kv">No releases found. Try a different title.</p>`;
+    ? rows.map(r => `<div class="trow"><span class="q">${esc((r.n.match(/2160p|1080p|720p|480p/i)||["—"])[0])}</span>
+        <span class="sz">${esc((r.s/1048576).toFixed(0))} MB · ${esc(r.n.slice(0,55))}</span>
+        <span class="sd">▲ ${r.sd}</span>
+        <button data-m="${esc("magnet:?xt=urn:btih:" + r.h + "&dn=" + encodeURIComponent(r.n) + TR.map(t => "&tr=" + encodeURIComponent(t)).join(""))}">Magnet</button></div>`).join("")
+    : `<p class="kv">No releases found.</p>`;
   host.onclick = e => {
     const b = e.target.closest("[data-m]"); if (!b) return;
-    navigator.clipboard?.writeText(b.dataset.m)
-      .then(() => toast("Magnet copied", "ok"))
-      .catch(() => toast("Copy blocked", "err"));
+    navigator.clipboard?.writeText(b.dataset.m).then(() => toast("Magnet copied", "ok")).catch(() => toast("Copy blocked", "err"));
   };
 }
 
@@ -1165,7 +1176,7 @@ function toggleList(o, btn) {
 
 function closeDetail() {
   if (!$("#modal").classList.contains("on")) return;
-  SFX.whoosh(false);
+  SFX.whoosh();
   $("#modal").classList.remove("on");
   $("#scrim").classList.remove("on");
   $("#modal").innerHTML = "";
@@ -1209,10 +1220,13 @@ document.addEventListener("click", e => {
   const retry = e.target.closest("[data-retry]");
   if (retry) {
     const el = document.getElementById(retry.dataset.retry); if (!el) return;
-    el.innerHTML = '<div class="sk"></div>'.repeat(8);
-    fillRow(retry.dataset.retry, retry.dataset.type, JSON.parse(el.dataset.steps || "[{}]"));
+    el.innerHTML = '<div class="sk"></div>'.repeat(7);
+    fillRow(el, retry.dataset.type, JSON.parse(el.dataset.steps || "[{}]"));
     return;
   }
+
+  const see = e.target.closest("[data-see]");
+  if (see) { e.stopPropagation(); renderBrowse(see.dataset.see, { genre:"" }); return; }
 
   const fav = e.target.closest("[data-fav]");
   if (fav && !fav.closest("#modal")) {
@@ -1223,12 +1237,16 @@ document.addEventListener("click", e => {
       poster:el.querySelector("img")?.getAttribute("src") || "" }, null);
     return;
   }
+
+  /* ▶ opens AND plays */
   const pl = e.target.closest("[data-play]");
-  if (pl) { e.stopPropagation(); openDetail(pl.dataset.play, pl.dataset.ptype); return; }
+  if (pl) { e.stopPropagation(); openDetail(pl.dataset.play, pl.dataset.ptype, true); return; }
+
   const op = e.target.closest("[data-open]");
-  if (op) { e.stopPropagation(); openDetail(op.dataset.open, op.dataset.ot); return; }
+  if (op) { e.stopPropagation(); openDetail(op.dataset.open, op.dataset.ot, false); return; }
+
   const c = e.target.closest(".card");
-  if (c && !c.closest("#modal")) openDetail(c.dataset.id, c.dataset.type);
+  if (c && !c.closest("#modal")) openDetail(c.dataset.id, c.dataset.type, false);
 });
 
 $("#scrim").onclick = closeDetail;
@@ -1239,7 +1257,7 @@ $("#navLinks").onclick = e => {
   const b = e.target.closest("button"); if (!b) return;
   $$("#navLinks button").forEach(x => x.classList.toggle("on", x === b));
   const p = b.dataset.page;
-  hidePreview(); SFX.whoosh(true);
+  hidePreview(); SFX.whoosh();
   scrollTo({ top:0, behavior:"smooth" });
   if (p === "home") renderHome();
   else if (p === "list") renderList();
