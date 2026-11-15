@@ -1,134 +1,1248 @@
-<!DOCTYPE html>
-<html lang="de">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Videos einbetten</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
-    }
-    h1 {
-      text-align: center;
-    }
-    #video-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .video {
-      width: 480px;
-      height: 270px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      background: white;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    form {
-      max-width: 600px;
-      margin: 0 auto;
-      display: flex;
-      gap: 10px;
-      margin-top: 30px;
-    }
-    input[type="text"] {
-      flex-grow: 1;
-      padding: 8px 12px;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 8px 15px;
-      font-size: 1rem;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    #error-msg {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REELJACK</title>
+<meta name="color-scheme" content="dark">
+<meta name="description" content="A cozy little corner of the internet for movies and series.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f3a86b'/%3E%3Ctext x='50' y='70' font-size='58' font-family='Georgia' font-weight='bold' fill='%23120f0d' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#100d0b; --bg2:#171210; --card:#241c17; --card2:#2d231c;
+  --line:rgba(255,238,220,.09); --line2:rgba(255,238,220,.16);
+  --txt:#f6ede3; --dim:#b3a08c; --dim2:#8a7867;
+  --amber:#f3a86b; --amber2:#e8783f; --glow:rgba(243,168,107,.34);
+  --ok:#8fd694; --bad:#e88b7a; --r:12px; --cw:clamp(104px,11.6vw,150px);
+  --ease:cubic-bezier(.22,.8,.28,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--txt);
+  font:15px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:80px;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(70vw 55vh at 22% -8%,rgba(243,168,107,.14),transparent 62%),
+    radial-gradient(60vw 50vh at 88% 8%,rgba(232,120,63,.10),transparent 65%),
+    radial-gradient(120vw 90vh at 50% 120%,rgba(120,80,60,.16),transparent 70%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(243,168,107,.3)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:6px}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#3a2e25;border-radius:8px;border:2px solid var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
+.hide{display:none!important}
+h1,h2,h3,.serif{font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;letter-spacing:-.02em}
+
+nav{position:fixed;inset:0 0 auto;z-index:100;display:flex;align-items:center;gap:22px;padding:16px 4%;
+  transition:background .4s var(--ease),padding .4s var(--ease),border-color .4s;
+  background:linear-gradient(180deg,rgba(16,13,11,.92),rgba(16,13,11,.45) 65%,transparent);
+  border-bottom:1px solid transparent}
+nav.solid{background:rgba(16,13,11,.94);backdrop-filter:blur(14px) saturate(130%);
+  border-bottom-color:var(--line);padding:11px 4%}
+.brand{font-family:Georgia,serif;font-weight:700;font-size:21px;letter-spacing:-.03em;
+  color:var(--amber);white-space:nowrap;text-shadow:0 0 26px var(--glow)}
+.links{display:flex;gap:19px;font-size:14px;color:var(--dim)}
+.links button{padding:5px 0;position:relative;transition:color .2s}
+.links button:hover{color:var(--txt)}
+.links button.on{color:var(--txt)}
+.links button.on::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;
+  border-radius:2px;background:var(--amber);box-shadow:0 0 12px var(--glow);animation:grow .3s var(--ease)}
+@keyframes grow{from{transform:scaleX(0)}}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:9px}
+.iconbtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;
+  background:rgba(255,238,220,.06);border:1px solid transparent;transition:.2s var(--ease)}
+.iconbtn:hover{background:rgba(255,238,220,.13);border-color:var(--line2);transform:translateY(-1px)}
+.iconbtn.off{opacity:.45}
+.avatar{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:13px;
+  background:linear-gradient(145deg,var(--amber),var(--amber2));color:#241a12}
+
+#volpop{position:fixed;top:60px;right:4%;z-index:120;background:rgba(36,28,23,.97);
+  border:1px solid var(--line2);border-radius:14px;padding:12px 14px;display:none;
+  box-shadow:0 20px 50px rgba(0,0,0,.6);backdrop-filter:blur(12px)}
+#volpop.on{display:block;animation:pop .22s var(--ease)}
+#volpop label{font-size:11px;color:var(--dim);display:block;margin-bottom:7px;letter-spacing:.05em}
+#volpop input{width:150px;accent-color:var(--amber)}
+
+#bill{position:relative;height:min(84vh,720px);display:flex;align-items:flex-end;padding:0 4% 9vh;
+  overflow:hidden;background:#0a0806}
+#bill .bd{position:absolute;inset:0;background-size:cover;background-position:50% 20%;animation:fade 1s var(--ease)}
+#bill .bd::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(16,13,11,.96) 0%,rgba(16,13,11,.7) 44%,rgba(16,13,11,.1) 74%),
+             linear-gradient(0deg,var(--bg) 2%,transparent 48%)}
+#bill iframe{position:absolute;inset:0;width:100%;height:100%;border:0;transform:scale(1.35);
+  opacity:0;transition:opacity 1.2s var(--ease)}
+#bill iframe.on{opacity:1}
+#bill .inner{position:relative;max-width:640px;z-index:2;animation:rise .8s var(--ease)}
+#bill .logo{max-width:min(420px,60vw);max-height:150px;object-fit:contain;object-position:left bottom;
+  margin-bottom:16px;filter:drop-shadow(0 8px 30px rgba(0,0,0,.9))}
+#bill h1{font-size:clamp(31px,5.4vw,58px);line-height:1.04;font-weight:700;margin-bottom:14px;
+  text-shadow:0 6px 34px rgba(0,0,0,.8)}
+#bill .m{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:#d9cbbc;margin-bottom:14px}
+#bill .m .match{color:var(--ok);font-weight:700}
+#bill p{font-size:15px;color:#e0d3c4;max-width:52ch;margin-bottom:22px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.acts{display:flex;gap:9px;flex-wrap:wrap}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;padding:11px 23px;
+  border-radius:var(--r);font-size:14.5px;font-weight:600;transition:.2s var(--ease);
+  background:rgba(255,238,220,.1);border:1px solid var(--line2)}
+.btn:hover{background:rgba(255,238,220,.18);transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.985)}
+.btn.light{background:var(--txt);color:#221812;border-color:transparent}
+.btn.light:hover{background:#fff}
+.btn.red{background:linear-gradient(145deg,var(--amber),var(--amber2));color:#2a1a10;border-color:transparent;
+  box-shadow:0 8px 26px -12px var(--amber)}
+.btn.red:hover{box-shadow:0 10px 30px -10px var(--amber)}
+.btn.sm{padding:8px 15px;font-size:12.5px}
+.ripple{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);
+  background:radial-gradient(circle,rgba(255,238,220,.55),transparent 70%);
+  animation:rip .55s var(--ease) forwards}
+@keyframes rip{to{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}}
+
+main{padding:0 0 40px;position:relative;z-index:2;margin-top:-5vh}
+main.view{animation:viewin .45s var(--ease)}
+@keyframes viewin{from{opacity:0;transform:translateY(10px)}}
+.row{margin-bottom:30px}
+.rowhead{display:flex;align-items:baseline;gap:12px;padding:0 4% 8px}
+.rowhead h2{font-size:clamp(16px,1.6vw,19px);font-weight:700;color:#f0e4d6}
+.rowhead .more{margin-left:auto;font-size:12px;color:var(--dim2);transition:.2s}
+.rowhead .more:hover{color:var(--amber)}
+.rail{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:12px 4% 10px;
+  scroll-behavior:smooth;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+
+.card{flex:0 0 auto;width:var(--cw);border-radius:var(--r);position:relative;
+  transition:transform .26s var(--ease);transform-origin:center}
+.card:hover{transform:scale(1.07);z-index:20}
+.card .art{aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;background:var(--card);
+  box-shadow:0 6px 18px rgba(0,0,0,.5);position:relative;cursor:pointer;
+  border:1px solid rgba(255,238,220,.06);transition:box-shadow .3s var(--ease),border-color .3s}
+.card:hover .art{box-shadow:0 16px 40px -14px rgba(0,0,0,.85),0 0 0 1px rgba(243,168,107,.4),
+  0 0 34px -8px var(--glow);border-color:rgba(243,168,107,.35)}
+.card .art img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease),filter .3s}
+.card:hover .art img{filter:brightness(1.06)}
+.card .art .ph{width:100%;height:100%;display:grid;place-items:center;text-align:center;padding:6px;
+  font-size:10.5px;font-weight:600;line-height:1.3;color:var(--dim);
+  background:linear-gradient(155deg,#2b221b,#1a1411)}
+.card .badge{position:absolute;top:5px;left:5px;font-size:9px;font-weight:700;letter-spacing:.04em;
+  padding:2px 5px;border-radius:4px;background:rgba(16,13,11,.82);backdrop-filter:blur(4px);z-index:3}
+.card .badge.hd{color:var(--ok);border:1px solid rgba(143,214,148,.35)}
+.card .fav{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;font-size:11px;
+  display:grid;place-items:center;background:rgba(16,13,11,.8);border:1px solid var(--line2);
+  opacity:0;transition:.18s var(--ease);z-index:5}
+.card:hover .fav,.card .fav.on{opacity:1}
+.card .fav.on{background:var(--amber);border-color:var(--amber);color:#241a12}
+.card .kill{position:absolute;top:4px;right:4px;width:23px;height:23px;border-radius:50%;font-size:10px;
+  display:grid;place-items:center;background:rgba(16,13,11,.82);border:1px solid var(--line2);
+  opacity:0;transition:.18s;z-index:6}
+.card:hover .kill{opacity:1}
+.card .kill:hover{background:var(--bad);border-color:var(--bad);color:#241a12}
+.card .prev{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;opacity:0;
+  pointer-events:none;transition:opacity .35s;background:#000;z-index:2}
+.card .prev.on{opacity:1}
+.card .prev iframe{width:300%;height:100%;margin-left:-100%;border:0}
+
+.card .info{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:20px 7px 8px;
+  border-radius:0 0 var(--r) var(--r);opacity:0;transition:opacity .2s;
+  background:linear-gradient(0deg,rgba(16,13,11,.96) 40%,rgba(16,13,11,.6) 78%,transparent);
+  pointer-events:none}
+.card:hover .info{opacity:1;pointer-events:auto}
+.card .info .t{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .info .r{display:flex;gap:6px;align-items:center;font-size:10px;color:var(--dim)}
+.card .info .match{color:var(--ok);font-weight:700}
+.card .info .acts2{display:flex;gap:5px;margin-top:6px}
+.card .info .acts2 button{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;font-size:10px;
+  background:rgba(255,238,220,.16);border:1px solid var(--line2);transition:.15s}
+.card .info .acts2 button:hover{background:var(--amber);color:#241a12;border-color:var(--amber)}
+.card .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,238,220,.22);
+  overflow:hidden;z-index:7;border-radius:0 0 var(--r) var(--r)}
+.card .bar i{display:block;height:100%;background:var(--amber);transition:width .6s linear}
+.card.watched .bar i{background:var(--ok)}
+.cont-label{font-size:10px;color:var(--dim);margin-top:3px}
+.card .cap{display:none;font-size:11px;font-weight:600;line-height:1.3;margin-top:5px;color:var(--dim);
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+
+.sk{flex:0 0 auto;width:var(--cw);aspect-ratio:2/3;border-radius:var(--r);
+  background:linear-gradient(100deg,#1d1713,#2b221b,#1d1713);background-size:220% 100%;animation:sh 1.5s linear infinite}
+@keyframes sh{0%{background-position:120% 0}100%{background-position:-120% 0}}
+
+.rowfail{display:flex;align-items:center;gap:10px;padding:6px 4%;color:var(--dim);font-size:13px}
+.rowfail button{padding:5px 13px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--txt)}
+.rowfail button:hover{background:var(--amber);color:#241a12;border-color:var(--amber)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:14px 9px;padding:16px 4% 40px}
+.grid .card{width:auto}
+.grid .card:hover{transform:scale(1.05)}
+h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:14px 4%;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{padding:7px 15px;border-radius:99px;border:1px solid var(--line2);font-size:12.5px;
+  color:var(--dim);white-space:nowrap;transition:.2s var(--ease)}
+.chips button:hover{color:var(--txt);border-color:var(--amber);background:rgba(243,168,107,.1)}
+.chips button.on{background:var(--amber);color:#241a12;border-color:var(--amber);font-weight:700}
+.empty{text-align:center;padding:120px 20px;color:var(--dim);font-size:14px}
+.empty b{display:block;color:var(--txt);font-family:Georgia,serif;font-size:20px;margin-bottom:8px}
+.greet{padding:104px 4% 0;font-size:13px;color:var(--dim2);letter-spacing:.05em;text-transform:uppercase}
+
+#scrim{position:fixed;inset:0;background:rgba(8,6,5,.8);backdrop-filter:blur(5px);z-index:200;
+  opacity:0;pointer-events:none;transition:.3s}
+#scrim.on{opacity:1;pointer-events:auto}
+#modal{position:fixed;inset:0;z-index:210;overflow-y:auto;opacity:0;pointer-events:none;
+  transition:.3s var(--ease);padding:4vh 16px}
+#modal.on{opacity:1;pointer-events:auto}
+.sheet{max-width:880px;margin:0 auto;background:var(--bg2);border-radius:16px;overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px var(--line);
+  transform:translateY(24px) scale(.985);transition:.4s var(--ease)}
+#modal.on .sheet{transform:none}
+.hero{position:relative;aspect-ratio:16/9;background:#0a0806}
+.hero img{width:100%;height:100%;object-fit:cover}
+.hero .fade{position:absolute;inset:0;background:linear-gradient(0deg,var(--bg2) 3%,rgba(23,18,16,.1) 55%)}
+.hero .x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
+  background:rgba(16,13,11,.82);border:1px solid var(--line2);display:grid;place-items:center;font-size:14px;z-index:3;
+  transition:.2s}
+.hero .x:hover{background:var(--amber);color:#241a12;transform:rotate(90deg)}
+.hero .body{position:absolute;left:0;right:0;bottom:0;padding:24px 26px 18px}
+.hero h2{font-size:clamp(23px,3.4vw,35px);font-weight:700;line-height:1.08;margin-bottom:12px}
+.hero .lg{max-width:min(320px,50%);max-height:96px;object-fit:contain;object-position:left bottom;
+  margin-bottom:12px;filter:drop-shadow(0 4px 18px rgba(0,0,0,.85))}
+.mrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:#cdbfae;margin-bottom:14px}
+.mrow .match{color:var(--ok);font-weight:700}
+.tagline{font-size:11px;padding:2px 8px;border:1px solid var(--line2);border-radius:99px;color:var(--dim)}
+.tagline.resume{color:#ffd7a8;border-color:rgba(243,168,107,.4);background:rgba(243,168,107,.1)}
+.player{aspect-ratio:16/9;background:#000;border-bottom:1px solid var(--line)}
+.player iframe{width:100%;height:100%;border:0}
+.servers{display:flex;gap:7px;flex-wrap:wrap;padding:11px 26px;border-bottom:1px solid var(--line);align-items:center}
+.servers span{font-size:10.5px;color:var(--dim2);margin-right:4px;text-transform:uppercase;letter-spacing:.1em}
+.servers button{padding:5px 12px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--dim);transition:.18s}
+.servers button:hover{color:var(--txt);border-color:var(--amber)}
+.servers button.on{background:var(--amber);color:#241a12;border-color:var(--amber);font-weight:700}
+.sheet .pad{padding:18px 26px 30px}
+.ov{font-size:14.5px;color:#d8cab9;margin-bottom:16px;line-height:1.7}
+.kv{font-size:12.5px;color:var(--dim);margin-bottom:8px}
+.kv b{color:#d3c5b4;font-weight:600}
+.tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin:0 26px;font-size:13px;font-weight:600;overflow-x:auto}
+.tabs button{padding:12px 0;color:var(--dim2);border-bottom:2px solid transparent;margin-bottom:-1px;
+  white-space:nowrap;transition:.2s}
+.tabs button:hover{color:var(--txt)}
+.tabs button.on{color:var(--amber);border-color:var(--amber)}
+.seasons{padding:16px 26px 4px}
+.seasons select{background:var(--card);border:1px solid var(--line2);color:var(--txt);padding:7px 11px;
+  border-radius:8px;font-size:13px;outline:none}
+.eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;padding:12px 26px 26px}
+.ep{display:flex;gap:10px;align-items:center;padding:8px;background:var(--card);border-radius:9px;
+  border:1px solid transparent;transition:.2s var(--ease);text-align:left;width:100%;position:relative;overflow:hidden}
+.ep:hover{background:var(--card2);border-color:var(--line2);transform:translateX(2px)}
+.ep.now{border-color:rgba(243,168,107,.5)}
+.ep .th{width:74px;aspect-ratio:16/9;border-radius:6px;object-fit:cover;background:#2a211b;flex:0 0 auto}
+.ep .n{font-weight:700;color:var(--dim);font-size:12px}
+.ep .et{font-size:12.5px;line-height:1.4}
+.ep .et small{display:block;color:var(--dim2);font-size:11px;margin-top:2px}
+.ep .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,238,220,.12)}
+.ep .bar i{display:block;height:100%;background:var(--amber)}
+.trow{display:flex;gap:10px;align-items:center;padding:9px 11px;background:var(--card);border-radius:9px;
+  margin-bottom:7px;border:1px solid transparent;transition:.18s}
+.trow:hover{border-color:var(--line2);background:var(--card2)}
+.trow .q{font-weight:700;font-size:12px;min-width:48px;color:var(--amber)}
+.trow .sz{font-size:12px;color:var(--dim);flex:1}
+.trow .sd{font-size:12px;color:var(--ok);font-weight:700;min-width:52px;text-align:right}
+.trow button{background:rgba(255,238,220,.12);padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:600;transition:.18s}
+.trow button:hover{background:var(--amber);color:#241a12}
+.cast{display:flex;gap:12px;overflow-x:auto;padding:4px 0 16px}
+.cast div{flex:0 0 auto;width:76px;text-align:center}
+.cast .av{width:76px;height:76px;border-radius:50%;background:var(--card2);display:grid;place-items:center;
+  font-family:Georgia,serif;font-size:24px;color:var(--dim2);border:1px solid var(--line)}
+.cast p{font-size:11px;margin-top:6px;line-height:1.35;color:var(--dim)}
+
+#toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:400;display:flex;
+  flex-direction:column;gap:8px;align-items:center}
+.toast{padding:10px 18px;border-radius:99px;background:rgba(45,35,28,.97);border:1px solid var(--line2);
+  font-size:13px;animation:pop .3s var(--ease);backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.toast.ok{border-color:rgba(143,214,148,.5);color:#b9e8bd}
+.toast.err{border-color:rgba(232,139,122,.5);color:#ffb9ab}
+@keyframes pop{from{transform:translateY(14px) scale(.94);opacity:0}}
+
+@media(max-width:700px){
+  :root{--cw:clamp(96px,27vw,124px)}
+  .links{gap:14px;font-size:13px}
+  #bill{height:72vh;padding-bottom:12vh}
+  .hero .body{padding:16px}
+  .sheet .pad,.tabs,.servers,.eps,.seasons{padding-left:16px;padding-right:16px}
+  .tabs{margin:0 16px}
+  .card:hover{transform:none}
+  .card .prev{display:none}
+  .card .cap{display:-webkit-box}
+  .card .fav{opacity:1}
+  .card .info{display:none}
+  .greet{padding-top:100px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body>
 
-  <h1>Video-Link einfügen und ansehen</h1>
+<nav id="nav">
+  <div class="brand">Reeljack</div>
+  <div class="links" id="navLinks">
+    <button data-page="home" class="on">Home</button>
+    <button data-page="movies">Movies</button>
+    <button data-page="tv">Series</button>
+    <button data-page="list">My List</button>
+  </div>
+  <div class="nav-right">
+    <button class="iconbtn" id="searchBtn" title="Search">⌕</button>
+    <button class="iconbtn" id="sndBtn" title="Sound">♪</button>
+    <div class="avatar">R</div>
+  </div>
+</nav>
 
-  <form id="video-form">
-    <input type="text" id="video-url" placeholder="YouTube- oder Vimeo-Link hier eingeben" required />
-    <button type="submit">Video hinzufügen</button>
-  </form>
+<div id="volpop"><label for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="60"></div>
 
-  <div id="error-msg"></div>
+<div id="bill"></div>
+<main id="main"></main>
 
-  <div id="video-list"></div>
+<div id="scrim"></div>
+<aside id="modal" aria-hidden="true"></aside>
+<div id="toasts"></div>
 
-  <script>
-    const form = document.getElementById('video-form');
-    const videoUrlInput = document.getElementById('video-url');
-    const videoList = document.getElementById('video-list');
-    const errorMsg = document.getElementById('error-msg');
+<script>
+(() => {
+"use strict";
 
-    function extractYouTubeID(url) {
-      // YouTube Video-ID aus verschiedenen URL-Formaten holen
-      const regExp = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/;
-      const match = url.match(regExp);
-      return match ? match[1] : null;
-    }
+/* ══════════════════ SOUND ══════════════════
+   Everything is synthesized — no files to host. One AudioContext,
+   created on the first gesture so autoplay policy stays happy. */
+const SFX = (() => {
+  let ctx = null, master = null;
+  let vol = parseFloat(localStorage.getItem("rj_vol") ?? "0.6");
+  let muted = localStorage.getItem("rj_mute") === "1";
+  let lastHover = 0;
 
-    function extractVimeoID(url) {
-      // Vimeo Video-ID (meistens nur Zahlen)
-      const regExp = /vimeo\.com\/(\d+)/;
-      const match = url.match(regExp);
-      return match ? match[1] : null;
-    }
+  function boot() {
+    if (ctx) { if (ctx.state === "suspended") ctx.resume(); return ctx; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = muted ? 0 : vol * 0.5;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+  const now = () => ctx.currentTime;
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      errorMsg.textContent = '';
+  function noise(dur) {
+    const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    return src;
+  }
+  function env(g, peak, attack, decay, at) {
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(Math.max(peak, 0.0002), at + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
+  }
 
-      const url = videoUrlInput.value.trim();
-      if (!url) {
-        errorMsg.textContent = 'Bitte gib eine gültige URL ein.';
-        return;
-      }
+  /* soft mechanical tick — keys and hovers */
+  function tick(gain = 0.5, pitch = 1) {
+    if (!boot() || muted) return;
+    const t = now();
+    const n = noise(0.02);
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 2400 * pitch;
+    bp.Q.value = 1.4;
+    const g = ctx.createGain();
+    env(g, 0.09 * gain, 0.001, 0.028, t);
+    n.connect(bp).connect(g).connect(master);
+    n.start(t);
+    const o = ctx.createOscillator();
+    o.type = "square";
+    o.frequency.value = 1500 * pitch;
+    const og = ctx.createGain();
+    env(og, 0.03 * gain, 0.001, 0.014, t);
+    o.connect(og).connect(master);
+    o.start(t); o.stop(t + 0.04);
+  }
 
-      let embedUrl = '';
-      const ytId = extractYouTubeID(url);
-      const vimeoId = extractVimeoID(url);
+  /* rounded "thock" for clicks */
+  function thock(gain = 1) {
+    if (!boot() || muted) return;
+    const t = now();
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(300, t);
+    o.frequency.exponentialRampToValueAtTime(115, t + 0.09);
+    const g = ctx.createGain();
+    env(g, 0.16 * gain, 0.004, 0.1, t);
+    o.connect(g).connect(master);
+    o.start(t); o.stop(t + 0.16);
+    const n = noise(0.035);
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 1100;
+    const ng = ctx.createGain();
+    env(ng, 0.07 * gain, 0.002, 0.035, t);
+    n.connect(lp).connect(ng).connect(master);
+    n.start(t);
+  }
 
-      if (ytId) {
-        embedUrl = `https://www.youtube.com/embed/${ytId}`;
-      } else if (vimeoId) {
-        embedUrl = `https://player.vimeo.com/video/${vimeoId}`;
-      } else {
-        errorMsg.textContent = 'Nur YouTube- oder Vimeo-Links sind erlaubt.';
-        return;
-      }
+  /* airy sweep for opening things */
+  function whoosh(up = true) {
+    if (!boot() || muted) return;
+    const t = now();
+    const n = noise(0.34);
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.Q.value = 0.8;
+    bp.frequency.setValueAtTime(up ? 260 : 1500, t);
+    bp.frequency.exponentialRampToValueAtTime(up ? 1900 : 240, t + 0.32);
+    const g = ctx.createGain();
+    env(g, 0.09, 0.05, 0.28, t);
+    n.connect(bp).connect(g).connect(master);
+    n.start(t);
+  }
 
-      const videoDiv = document.createElement('div');
-      videoDiv.className = 'video';
-      videoDiv.innerHTML = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Eingebettetes Video"></iframe>`;
-
-      videoList.appendChild(videoDiv);
-      videoUrlInput.value = '';
+  /* two-note chime for confirms */
+  function chime(up = true) {
+    if (!boot() || muted) return;
+    const t = now();
+    [up ? 660 : 520, up ? 990 : 390].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = "triangle";
+      o.frequency.value = f;
+      const g = ctx.createGain();
+      env(g, 0.075, 0.008, 0.24, t + i * 0.07);
+      o.connect(g).connect(master);
+      o.start(t + i * 0.07);
+      o.stop(t + i * 0.07 + 0.3);
     });
-  </script>
+  }
 
+  /* low thud for removal / error */
+  function thud() {
+    if (!boot() || muted) return;
+    const t = now();
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(150, t);
+    o.frequency.exponentialRampToValueAtTime(62, t + 0.16);
+    const g = ctx.createGain();
+    env(g, 0.15, 0.005, 0.17, t);
+    o.connect(g).connect(master);
+    o.start(t); o.stop(t + 0.24);
+  }
+
+  function hover() {
+    const t = performance.now();
+    if (t - lastHover < 110) return;
+    lastHover = t;
+    tick(0.3, 1.15 + Math.random() * 0.3);
+  }
+
+  function key() { tick(0.42, 0.9 + Math.random() * 0.45); }
+
+  function setVol(v) {
+    vol = v;
+    localStorage.setItem("rj_vol", String(v));
+    if (master) master.gain.value = muted ? 0 : vol * 0.5;
+  }
+  function toggleMute() {
+    muted = !muted;
+    localStorage.setItem("rj_mute", muted ? "1" : "0");
+    if (master) master.gain.value = muted ? 0 : vol * 0.5;
+    if (!muted) chime(true);
+    return muted;
+  }
+  return { tick, thock, whoosh, chime, thud, hover, key, setVol, toggleMute,
+    get muted() { return muted; }, get vol() { return vol; }, boot };
+})();
+
+/* first gesture unlocks audio */
+addEventListener("pointerdown", () => SFX.boot(), { once:true });
+addEventListener("keydown", () => SFX.boot(), { once:true });
+
+/* ══════════════════ SOURCES ══════════════════ */
+const CM      = "https://v3-cinemeta.strem.io";
+const METAHUB = "https://images.metahub.space";
+const APIBAY  = "https://apibay.org";
+const YTS     = "https://movies-api.accel.li/api/v2/list_movies.json";
+
+const DIRECT = { id:"direct", fn:u => u };
+const RELAYS = [
+  { id:"corsproxy", fn:u => "https://corsproxy.io/?url=" + encodeURIComponent(u) },
+  { id:"allorigins", fn:u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
+  { id:"codetabs", fn:u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
+  { id:"thingproxy", fn:u => "https://thingproxy.freeboard.io/fetch/" + u },
+];
+const TRACKERS = ["udp://tracker.opentrackr.org:1337/announce","udp://open.demonii.com:1337/announce",
+  "udp://tracker.openbittorrent.com:6969/announce","udp://exodus.desync.com:6969/announce"];
+
+const SERVERS = [
+  { name:"VidSrc", kind:"imdb", m:id=>`https://vidsrc.mov/embed/movie/${id}`,   t:(id,s,e)=>`https://vidsrc.mov/embed/tv/${id}/${s}/${e}` },
+  { name:"2Embed", kind:"imdb", m:id=>`https://www.2embed.cc/embed/${id}`,      t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
+  { name:"VidLink", kind:"tmdb", m:id=>`https://vidlink.pro/movie/${id}`,        t:(id,s,e)=>`https://vidlink.pro/tv/${id}/${s}/${e}` },
+  { name:"Videasy", kind:"tmdb", m:id=>`https://player.videasy.net/movie/${id}`, t:(id,s,e)=>`https://player.videasy.net/tv/${id}/${s}/${e}` },
+  { name:"EmbedWave", kind:"tmdb", m:id=>`https://embedwave.cc/embed/movie/${id}`, t:(id,s,e)=>`https://embedwave.cc/embed/tv/${id}/${s}/${e}` },
+];
+
+const GENRES = {
+  movie:["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama","Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western"],
+  series:["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama","Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western","Reality-TV","Talk-Show","Game-Show"],
+};
+
+/* ══════════════════ UTIL ══════════════════ */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const bytes = n => { n=+n||0; const u=["B","KB","MB","GB","TB"]; let i=0; while(n>=1024&&i<4){n/=1024;i++;} return n.toFixed(i?1:0)+" "+u[i]; };
+const magnet = (h,n) => "magnet:?xt=urn:btih:"+h+"&dn="+encodeURIComponent(n||"")+TRACKERS.map(t=>"&tr="+encodeURIComponent(t)).join("");
+const qOf = s => (/2160p|4k|uhd/i.test(s)?"2160p":/1080p/i.test(s)?"1080p":/720p/i.test(s)?"720p":/480p|dvdrip/i.test(s)?"480p":"");
+const yearOf = it => (it.releaseInfo || it.year || "").toString().slice(0,4);
+const pctOf = it => it.imdbRating ? Math.round(parseFloat(it.imdbRating) * 10) : 0;
+const minsOf = rt => { const n = parseInt(String(rt||"").replace(/\D+/g,""), 10); return Number.isFinite(n) && n > 0 ? n : 0; };
+const toast = (m,k="") => {
+  const t = document.createElement("div");
+  t.className = "toast " + k; t.textContent = m;
+  $("#toasts").appendChild(t);
+  k === "err" ? SFX.thud() : SFX.tick(0.4, 1.2);
+  setTimeout(()=>{t.style.opacity=0;t.style.transform="translateY(10px)";setTimeout(()=>t.remove(),300);},2200);
+};
+const clamp = (n,a,b) => Math.min(b, Math.max(a, n));
+const human = ms => { const m = Math.round(ms/60000); return m >= 60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; };
+
+const posterLadder = id => [`${METAHUB}/poster/medium/${id}/img`, `${METAHUB}/poster/small/${id}/img`];
+const posterAttrs = (id, title) =>
+  `loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${esc(posterLadder(id)[0])}"
+   data-lad="${esc(id)}" data-step="0" data-title="${esc(title)}" alt="${esc(title)}"`;
+
+/* ══════════════════ STORE ══════════════════ */
+const LS_LIST = "rj_list", LS_CONT = "rj_cont";
+const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || "null"); return v ?? d; } catch { return d; } };
+const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+const myList = () => read(LS_LIST, []);
+const inList = id => myList().some(x => x.id === id);
+const contList = () => read(LS_CONT, []);
+
+function saveCont(list) {
+  const now = Date.now();
+  write(LS_CONT, list.filter(c => now - c.updatedAt < 60 * 864e5)
+    .sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 24));
+}
+function progressOf(c) {
+  const expected = Math.max(c.expectedMs || 45 * 60000, 60000);
+  const frac = clamp((Date.now() - c.startedAt) / expected, 0, 1);
+  if (c.type === "series") {
+    const total = Math.max(c.totalEps || 1, 1);
+    return clamp(((c.epIndex || 0) + frac) / total * 100, 0, 100);
+  }
+  return frac * 100;
+}
+function upsertCont(item, season, episode, epIndex) {
+  const list = contList();
+  const i = list.findIndex(c => c.id === item.id);
+  const prev = i > -1 ? list[i] : null;
+  const entry = {
+    id:item.id, type:item.type, name:item.name || prev?.name || "Untitled",
+    poster:item.poster || prev?.poster || "",
+    season:season ?? prev?.season ?? null, episode:episode ?? prev?.episode ?? null,
+    epIndex:epIndex ?? prev?.epIndex ?? 0,
+    totalEps:(item.videos || []).length || prev?.totalEps || 0,
+    expectedMs:minsOf(item.runtime || (item.type === "series" ? 45 : 120)) * 60000,
+    startedAt:Date.now(), updatedAt:Date.now(),
+  };
+  if (i > -1) list[i] = entry; else list.unshift(entry);
+  saveCont(list);
+  renderContinue();
+}
+function removeCont(id) {
+  saveCont(contList().filter(c => c.id !== id));
+  renderContinue();
+  $$(`.card[data-id="${CSS.escape(id)}"]`).forEach(el => {
+    el.style.transition = "opacity .25s, transform .25s";
+    el.style.opacity = "0"; el.style.transform = "scale(.9)";
+    setTimeout(() => el.remove(), 260);
+  });
+  toast("Removed from Continue Watching");
+}
+
+/* ══════════════════ TRANSPORT ══════════════════ */
+let directOK = null;
+const cache = new Map();
+async function tryRoute(route, url) {
+  const r = await fetch(route.fn(url), { signal: AbortSignal.timeout(route.id === "direct" ? 7000 : 14000) });
+  if (!r.ok) throw new Error(route.id + " " + r.status);
+  return r.json();
+}
+async function getJSON(url, tries = 2) {
+  if (cache.has(url)) return cache.get(url);
+  const routes = directOK === false ? RELAYS : [DIRECT, ...RELAYS];
+  let lastErr;
+  for (let a = 0; a < tries; a++) {
+    for (const route of routes) {
+      try {
+        const j = await tryRoute(route, url);
+        directOK = route.id === "direct";
+        cache.set(url, j);
+        return j;
+      } catch (err) {
+        if (route.id === "direct") directOK = false;
+        lastErr = err;
+      }
+    }
+  }
+  throw lastErr || new Error("unreachable");
+}
+const catalog = (type, o = {}) => {
+  const p = [];
+  if (o.genre) p.push("genre=" + encodeURIComponent(o.genre));
+  if (o.search) p.push("search=" + encodeURIComponent(o.search));
+  if (o.skip) p.push("skip=" + o.skip);
+  return getJSON(`${CM}/catalog/${type}/${o.cat || "top"}.json` + (p.length ? "/" + p.join("&") : ""));
+};
+const metaOf = (type, id) => getJSON(`${CM}/meta/${type}/${id}.json`, 1).then(j => j.meta || j);
+const itemCache = new Map();
+
+/* ══════════════════ CARD ══════════════════ */
+function card(o, opts = {}) {
+  const type = o.type === "series" ? "series" : "movie";
+  const title = o.name || "Untitled";
+  const p = pctOf(o);
+  const on = inList(o.id);
+  const cont = contList().find(c => c.id === o.id);
+  const prog = cont ? progressOf(cont) : 0;
+  const done = prog >= 95;
+  itemCache.set(o.id, o);
+  const art = o.poster ? `<img ${posterAttrs(o.id, title)}>` : `<div class="ph">${esc(title)}</div>`;
+  const where = cont?.type === "series" && cont.episode ? `S${cont.season} E${cont.episode}` : "";
+  return `<article class="card ${done ? "watched" : ""}" data-id="${esc(o.id)}" data-type="${type}">
+    <div class="art">${art}
+      ${o.imdbRating ? `<span class="badge hd">${esc(o.imdbRating)}</span>` : ""}
+      ${opts.cont
+        ? `<button class="kill" data-kill="${esc(o.id)}" title="Remove">✕</button>`
+        : `<button class="fav ${on?"on":""}" data-fav="${esc(o.id)}" title="My List">★</button>`}
+      <div class="prev" data-prev="${esc(o.id)}"></div>
+      ${prog ? `<div class="bar"><i style="width:${prog.toFixed(1)}%"></i></div>` : ""}
+      <div class="info">
+        <div class="t">${esc(title)}</div>
+        <div class="r">${p?`<span class="match">${p}%</span>`:""}<span>${esc(yearOf(o))}</span>
+          <span class="badge" style="position:static">${type==="series"?"Series":"Film"}</span></div>
+        ${where ? `<div class="cont-label">${esc(where)} · ${Math.round(100 - prog)}% left</div>` : ""}
+        <div class="acts2">
+          <button data-play="${esc(o.id)}" data-ptype="${type}" title="Play">▶</button>
+          <button data-open="${esc(o.id)}" data-ot="${type}" title="Details">ⓘ</button>
+          <button data-fav="${esc(o.id)}" title="My List">★</button>
+        </div>
+      </div>
+    </div>
+    <div class="cap">${esc(title)}</div>
+  </article>`;
+}
+
+document.addEventListener("error", e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.dataset.lad) return;
+  const step = +img.dataset.step + 1;
+  const ladder = posterLadder(img.dataset.lad);
+  if (step < ladder.length) { img.dataset.step = step; img.src = ladder[step]; return; }
+  const ph = document.createElement("div");
+  ph.className = "ph"; ph.textContent = img.dataset.title || "";
+  img.replaceWith(ph);
+}, true);
+
+/* hover: soft tick + trailer preview */
+let prevTimer, prevEl, prevId;
+document.addEventListener("mouseover", e => {
+  const c = e.target.closest?.(".card");
+  if (!c || c.closest("#modal")) return;
+  if (window.matchMedia("(pointer:coarse)").matches) return;
+  if (prevId === c.dataset.id) return;
+  prevId = c.dataset.id;
+  SFX.hover();
+  clearTimeout(prevTimer);
+  const box = c.querySelector(".prev");
+  if (!box) return;
+  prevTimer = setTimeout(async () => {
+    try {
+      const m = await metaOf(c.dataset.type, c.dataset.id);
+      const t = (m.trailers || []).find(x => x.type === "Trailer") || (m.trailers || [])[0];
+      if (!t || prevId !== c.dataset.id) return;
+      prevEl?.classList.remove("on");
+      box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      box.classList.add("on");
+      prevEl = box;
+    } catch {}
+  }, 900);
+});
+document.addEventListener("mouseout", e => {
+  const c = e.target.closest?.(".card");
+  if (c && !c.contains(e.relatedTarget)) {
+    clearTimeout(prevTimer);
+    prevId = null;
+    c.querySelector(".prev")?.classList.remove("on");
+  }
+});
+
+/* ══════════════════ BILLBOARD ══════════════════ */
+async function billboard() {
+  try {
+    const j = await catalog("movie");
+    const pool = (j.metas || []).filter(x => x.background).slice(0, 8);
+    if (!pool.length) return;
+    const o = pool[Math.floor(Math.random() * pool.length)];
+    itemCache.set(o.id, o);
+    const p = pctOf(o);
+    const cont = contList().find(c => c.id === o.id);
+    $("#bill").innerHTML = `
+      <div class="bd" style="background-image:url('${esc(o.background)}')"></div>
+      <div class="inner">
+        ${o.logo ? `<img class="logo" src="${esc(o.logo)}" alt="${esc(o.name)}" referrerpolicy="no-referrer">` : `<h1>${esc(o.name)}</h1>`}
+        <div class="m">
+          ${p?`<span class="match">${p}% match</span>`:""}
+          <span>${esc(yearOf(o))}</span><span class="tagline">Film</span><span>HD</span>
+          ${o.runtime?`<span>${esc(o.runtime)}</span>`:""}
+        </div>
+        <p>${esc(o.description || "")}</p>
+        <div class="acts">
+          <button class="btn light" data-play="${esc(o.id)}" data-ptype="movie">
+            ▶ ${cont ? "Resume" : "Play"}</button>
+          <button class="btn" data-open="${esc(o.id)}" data-ot="movie">ⓘ More info</button>
+          <button class="btn" id="muteTgl" title="Trailer">🔇</button>
+        </div>
+      </div>`;
+    setTimeout(async () => {
+      try {
+        const t = (o.trailers || []).find(x => x.type === "Trailer") || (o.trailers || [])[0];
+        if (!t) return;
+        const f = document.createElement("iframe");
+        f.src = `https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&mute=1&controls=0&loop=1&playlist=${t.source}&modestbranding=1&playsinline=1`;
+        f.allow = "autoplay; encrypted-media"; f.title = "trailer";
+        $("#bill").prepend(f);
+        requestAnimationFrame(() => f.classList.add("on"));
+        $("#muteTgl")?.addEventListener("click", ev => {
+          const on = f.classList.contains("on");
+          f.classList.toggle("on", !on);
+          ev.currentTarget.textContent = on ? "🔇" : "🔊";
+          SFX.tick(0.5, on ? 0.9 : 1.3);
+        });
+      } catch {}
+    }, 2000);
+  } catch {}
+}
+
+/* ══════════════════ CONTINUE WATCHING ══════════════════ */
+function renderContinue() {
+  const list = contList().filter(c => progressOf(c) < 97);
+  const host = $("#contRow");
+  if (!host) return;
+  if (!list.length) { host.classList.add("hide"); return; }
+  host.classList.remove("hide");
+  host.innerHTML = `<div class="rowhead"><h2>Continue Watching</h2>
+      <button class="more" id="clearCont">Clear all</button></div>
+    <div class="rail">${list.map(c => card(
+      { id:c.id, type:c.type, name:c.name, poster:c.poster }, { cont:true })).join("")}</div>`;
+  $("#clearCont").onclick = () => { saveCont([]); renderContinue(); SFX.thud(); toast("Continue Watching cleared"); };
+}
+
+let currentId = null;
+setInterval(() => {
+  const open = contList().find(c => c.id === currentId);
+  if (!open) return;
+  const pct = progressOf(open);
+  $$(`.card[data-id="${CSS.escape(open.id)}"] .bar i`).forEach(b => b.style.width = pct.toFixed(1) + "%");
+  const label = $("#resumeLabel");
+  if (label) label.textContent = `${Math.round(100 - pct)}% left · ${human(open.expectedMs * (1 - pct/100))} remaining`;
+}, 15000);
+
+/* ══════════════════ ROWS ══════════════════ */
+const rowShell = (t, id) => `<section class="row"><div class="rowhead"><h2>${esc(t)}</h2></div>
+  <div class="rail" id="${id}">${Array.from({length:8},()=>'<div class="sk"></div>').join("")}</div></section>`;
+
+async function fillRow(id, type, steps) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  for (const step of steps) {
+    try {
+      const j = await catalog(type, step);
+      const items = (j.metas || []).filter(x => x.poster);
+      if (!items.length) continue;
+      el.innerHTML = items.slice(0, 24).map(x => card(x)).join("");
+      return;
+    } catch {}
+  }
+  el.innerHTML = `<div class="rowfail"><span>Couldn't load this row.</span>
+    <button data-retry="${id}" data-type="${type}">Retry</button></div>`;
+  el.dataset.steps = JSON.stringify(steps);
+}
+
+const Y = new Date().getFullYear();
+const HOME = [
+  ["Trending Now",        "movie",  [{}]],
+  ["Popular Series",      "series", [{}]],
+  ["New Releases",        "movie",  [{ cat:"year", genre:String(Y) }, { cat:"year", genre:String(Y-1) }]],
+  ["New Series",          "series", [{ cat:"year", genre:String(Y) }, { cat:"year", genre:String(Y-1) }]],
+  ["Action & Adventure",  "movie",  [{ genre:"Action" }, { genre:"Adventure" }]],
+  ["Top Rated",           "movie",  [{ cat:"imdbRating" }, {}]],
+  ["Binge-worthy Series", "series", [{ cat:"imdbRating" }, {}]],
+  ["Comedy",              "movie",  [{ genre:"Comedy" }]],
+  ["Horror",              "movie",  [{ genre:"Horror" }]],
+  ["Sci-Fi",              "movie",  [{ genre:"Sci-Fi" }]],
+  ["Animation",           "movie",  [{ genre:"Animation" }]],
+  ["Drama",               "movie",  [{ genre:"Drama" }]],
+];
+
+const greeting = () => {
+  const h = new Date().getHours();
+  if (h < 5) return "Up late";
+  if (h < 12) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
+};
+
+function view(html) {
+  const main = $("#main");
+  main.innerHTML = html;
+  main.classList.remove("view");
+  void main.offsetWidth;
+  main.classList.add("view");
+}
+
+async function renderHome() {
+  $("#bill").classList.remove("hide");
+  view(`<div class="greet">${greeting()} · pull up something warm</div>
+    <section class="row hide" id="contRow"></section>`
+    + HOME.map(([t], i) => rowShell(t, "r" + i)).join(""));
+  renderContinue();
+  HOME.forEach(([,, steps], i) => {
+    if (i < 3) fillRow("r" + i, HOME[i][1], steps);
+    else setTimeout(() => fillRow("r" + i, HOME[i][1], steps), 60 * i);
+  });
+  billboard();
+}
+
+/* ══════════════════ BROWSE / LIST / SEARCH ══════════════════ */
+async function renderBrowse(type) {
+  $("#bill").classList.add("hide");
+  view(`<h3 class="page-h">${type==="movie"?"Movies":"Series"}</h3>
+    <div class="chips" id="gchips"><button class="on" data-g="">Popular</button>${
+      GENRES[type].map(g => `<button data-g="${g}">${g}</button>`).join("")}</div>
+    <div class="grid" id="bgrid"></div>`);
+  const load = async g => {
+    $("#bgrid").innerHTML = Array.from({length:18},()=>'<div class="sk"></div>').join("");
+    try {
+      const j = await catalog(type, g ? { genre:g } : {});
+      const items = (j.metas || []).filter(x => x.poster);
+      $("#bgrid").innerHTML = items.map(x => card(x)).join("")
+        || `<div class="empty" style="grid-column:1/-1"><b>Nothing here</b>Try another shelf.</div>`;
+    } catch {
+      $("#bgrid").innerHTML = `<div class="empty" style="grid-column:1/-1">
+        <b>Couldn't load</b><button class="btn sm" id="bgRetry" style="margin-top:10px">Retry</button></div>`;
+      $("#bgRetry").onclick = () => { SFX.tick(); load(g); };
+    }
+  };
+  $("#gchips").onclick = e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    SFX.tick(0.5);
+    $$("#gchips button").forEach(c => c.classList.toggle("on", c === b));
+    load(b.dataset.g);
+  };
+  load("");
+}
+
+function renderList() {
+  $("#bill").classList.add("hide");
+  const items = myList();
+  view(`<h3 class="page-h">My List</h3>
+    ${items.length ? `<div style="padding:12px 4% 0"><button class="btn sm" id="expBtn">Export list</button></div>` : ""}
+    <div class="grid" id="lgrid">${
+      items.length ? items.map(x => card(x)).join("")
+      : `<div class="empty" style="grid-column:1/-1"><b>Your list is empty</b>Tap the ★ on anything to keep it here.</div>`
+    }</div>`);
+  $("#expBtn")?.addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(items, null, 2)], { type:"application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "reeljack-list.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("List exported", "ok");
+  });
+}
+
+function renderSearch() {
+  $("#bill").classList.add("hide");
+  view(`<h3 class="page-h">Search</h3>
+    <div style="padding:14px 4% 0"><input id="sq" placeholder="Movies, series…" autocomplete="off"
+      style="width:100%;max-width:560px;padding:13px 16px;border-radius:99px;border:1px solid var(--line2);
+      background:rgba(255,238,220,.05);color:var(--txt);font-size:15px;outline:none;transition:.2s"></div>
+    <div class="grid" id="sgrid"></div>`);
+  const input = $("#sq");
+  input.focus();
+  input.onfocus = () => input.style.borderColor = "var(--amber)";
+  input.onblur = () => input.style.borderColor = "var(--line2)";
+  let t;
+  input.oninput = () => {
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      const q = input.value.trim();
+      if (q.length < 2) { $("#sgrid").innerHTML = ""; return; }
+      $("#sgrid").innerHTML = `<div class="sk"></div><div class="sk"></div><div class="sk"></div>`;
+      try {
+        const [mv, sr] = await Promise.allSettled([catalog("movie", { search:q }), catalog("series", { search:q })]);
+        const raw = [
+          ...(mv.status === "fulfilled" ? mv.value.metas || [] : []),
+          ...(sr.status === "fulfilled" ? sr.value.metas || [] : []),
+        ];
+        const seen = new Set();
+        const items = raw.filter(x => x.poster && !seen.has(x.id) && seen.add(x.id));
+        $("#sgrid").innerHTML = items.map(x => card(x)).join("")
+          || `<div class="empty" style="grid-column:1/-1"><b>No matches</b>Try a different spelling.</div>`;
+      } catch {}
+    }, 420);
+  };
+}
+
+/* ══════════════════ DETAIL ══════════════════ */
+let modalId, modalType, season = 1, server = 0, curMeta = null;
+
+async function openDetail(id, type) {
+  modalId = id; modalType = type;
+  SFX.whoosh(true);
+  $("#modal").classList.add("on");
+  $("#scrim").classList.add("on");
+  $("#modal").setAttribute("aria-hidden", "false");
+  $("#modal").innerHTML = `<div class="sheet"><div class="hero" style="display:grid;place-items:center">
+    <span style="color:var(--dim2)">loading…</span></div></div>`;
+
+  const seed = itemCache.get(id) || {};
+  let m;
+  try { m = await metaOf(type, id); }
+  catch { m = { ...seed, id, type }; }
+
+  try {
+    curMeta = m;
+    const title = m.name || "Untitled";
+    const on = inList(m.id);
+    const t = (m.trailers || []).find(x => x.type === "Trailer") || (m.trailers || [])[0];
+    const videos = (m.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
+    const seasons = [...new Set(videos.map(v => v.season).filter(s => s > 0))].sort((a,b)=>a-b);
+    const p = pctOf(m);
+    const cont = contList().find(c => c.id === m.id);
+    const prog = cont ? progressOf(cont) : 0;
+    const resumeSeason = cont?.season ?? seasons[0] ?? 1;
+    const resumeEp = cont?.episode ?? 1;
+    const bg = m.background || seed.background || "";
+
+    $("#modal").innerHTML = `<div class="sheet">
+      <div class="hero">
+        <button class="x" id="mx">✕</button>
+        ${bg ? `<img src="${esc(bg)}" alt="" referrerpolicy="no-referrer">` : ""}
+        <div class="fade"></div>
+        <div class="body">
+          ${m.logo ? `<img class="lg" src="${esc(m.logo)}" alt="${esc(title)}" referrerpolicy="no-referrer">` : `<h2>${esc(title)}</h2>`}
+          <div class="mrow">
+            ${p?`<span class="match">${p}% match</span>`:""}
+            <span>${esc(yearOf(m))}</span>
+            ${seasons.length?`<span>${seasons.length} season${seasons.length>1?"s":""}</span>`:""}
+            ${m.runtime?`<span>${esc(m.runtime)}</span>`:""}
+            <span class="tagline">HD</span>
+            ${prog >= 1 && prog < 97 ? `<span class="tagline resume" id="resumeLabel">${Math.round(100-prog)}% left</span>` : ""}
+          </div>
+          <div class="acts">
+            <button class="btn red" id="playBtn">▶ ${
+              prog >= 1 && prog < 97 ? `Resume${type==="series" ? ` S${resumeSeason} E${resumeEp}` : ""}` : "Play"}</button>
+            ${prog >= 1 ? `<button class="btn" id="restartBtn" title="Start over">↺ Restart</button>` : ""}
+            ${t?`<button class="btn" id="trBtn">🎬 Trailer</button>`:""}
+            <button class="btn" id="listBtn">${on?"✓ Saved":"+ My List"}</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="playerBox"></div>
+
+      <div class="tabs" id="tabs">
+        <button class="on" data-tab="ov">Overview</button>
+        ${seasons.length?`<button data-tab="ep">Episodes</button>`:""}
+        <button data-tab="dl">Download</button>
+      </div>
+
+      <div id="tab-ov" class="pad">
+        <p class="ov">${esc(m.description || "No synopsis available.")}</p>
+        ${m.awards?`<p class="kv">${esc(m.awards)}</p>`:""}
+        ${m.genres?.length?`<p class="kv">Genres <b>${m.genres.map(esc).join(", ")}</b></p>`:""}
+        ${m.director?.length?`<p class="kv">Director <b>${m.director.map(esc).join(", ")}</b></p>`:""}
+        ${m.country?`<p class="kv">Country <b>${esc(m.country)}</b></p>`:""}
+        ${m.cast?.length?`<div class="cast">${m.cast.slice(0,12).map(c=>`<div>
+          <div class="av">${esc((c[0]||"?").toUpperCase())}</div><p>${esc(c)}</p></div>`).join("")}</div>`:""}
+      </div>
+      ${seasons.length?`<div id="tab-ep" class="hide">
+        <div class="seasons"><select id="selS">${
+          seasons.map(s=>`<option value="${s}" ${s===resumeSeason?"selected":""}>Season ${s}</option>`).join("")}</select></div>
+        <div class="eps" id="eps"></div></div>`:""}
+      <div id="tab-dl" class="hide pad"><p class="kv">Torrent releases from public indexes.</p><div id="dl"></div></div>
+    </div>`;
+
+    $("#mx").onclick = closeDetail;
+    $("#listBtn").onclick = () => toggleList({ id:m.id, type, name:title, poster:m.poster,
+      releaseInfo:yearOf(m), imdbRating:m.imdbRating }, $("#listBtn"));
+    $("#playBtn").onclick = () => play(type === "series" ? resumeSeason : null, type === "series" ? resumeEp : null);
+    $("#restartBtn")?.addEventListener("click", () => {
+      saveCont(contList().filter(c => c.id !== m.id));
+      renderContinue();
+      play(type === "series" ? seasons[0] ?? 1 : null, 1);
+      $("#resumeLabel")?.remove();
+    });
+    $("#trBtn")?.addEventListener("click", () => {
+      $("#playerBox").innerHTML = `<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`;
+    });
+
+    $("#tabs").onclick = e => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      SFX.tick(0.5);
+      $$("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+      $$("#tab-ov,#tab-ep,#tab-dl").forEach(x => x.classList.add("hide"));
+      $("#tab-" + b.dataset.tab)?.classList.remove("hide");
+      if (b.dataset.tab === "ep" && !$("#eps").children.length) drawSeason(resumeSeason);
+      if (b.dataset.tab === "dl" && !$("#dl").children.length) loadTorrents(title, m.id);
+    };
+    $("#selS")?.addEventListener("change", e => { SFX.tick(); drawSeason(+e.target.value); });
+    if (seasons.length) drawSeason(resumeSeason);
+  } catch {
+    $("#modal").innerHTML = `<div class="sheet"><div class="pad">
+      <h2 style="margin-bottom:10px">Could not load</h2>
+      <p class="kv">The catalog server didn't answer. Retry in a moment.</p>
+      <button class="btn sm red" id="mx2">Close</button></div></div>`;
+    $("#mx2").onclick = closeDetail;
+  }
+}
+
+function drawSeason(n) {
+  season = n;
+  const videos = curMeta?.videos || [];
+  const eps = videos.filter(v => v.season === n).sort((a,b) => a.episode - b.episode);
+  const cont = contList().find(c => c.id === modalId);
+  $("#eps").innerHTML = eps.map(ep => {
+    const isNow = cont && cont.season === n && cont.episode === ep.episode;
+    const p = isNow ? progressOf(cont) : 0;
+    return `<button class="ep ${isNow ? "now" : ""}" data-e="${ep.episode}">
+      ${ep.thumbnail?`<img class="th" loading="lazy" src="${esc(ep.thumbnail)}" alt=""
+        referrerpolicy="no-referrer" onerror="this.style.display='none'">`:""}
+      <span><span class="n">E${ep.episode}</span> <span class="et">${esc(ep.name||"")}
+        <small>${esc((ep.firstAired||"").slice(0,10))}</small></span></span>
+      ${p ? `<span class="bar"><i style="width:${p.toFixed(1)}%"></i></span>` : ""}</button>`;
+  }).join("") || `<p class="kv">No episodes listed.</p>`;
+  $("#eps").onclick = e => {
+    const b = e.target.closest("[data-e]");
+    if (b) { SFX.thock(); play(season, +b.dataset.e); }
+  };
+}
+
+function play(s, e) {
+  const usable = SERVERS.filter(x => x.kind === "imdb" || curMeta?.moviedb_id);
+  if (!usable.length) return toast("No playable source", "err");
+  if (server >= usable.length) server = 0;
+  const srv = usable[server];
+  const id = srv.kind === "tmdb" ? curMeta.moviedb_id : modalId;
+  const url = modalType === "series" ? srv.t(id, s ?? 1, e ?? 1) : srv.m(id);
+
+  $("#playerBox").innerHTML = `<div class="servers" id="srvRow"><span>Server</span>${
+    usable.map((x,i)=>`<button class="${i===server?"on":""}" data-s="${i}">${x.name}</button>`).join("")}</div>
+    <div class="player"><iframe src="${url}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="origin"></iframe></div>`;
+  $("#srvRow").onclick = ev => {
+    const b = ev.target.closest("button");
+    if (!b) return;
+    SFX.tick(0.5);
+    server = +b.dataset.s;
+    play(s, e);
+  };
+  $("#playerBox").scrollIntoView({ behavior:"smooth", block:"center" });
+
+  if (curMeta) {
+    const vids = (curMeta.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
+    const idx = modalType === "series"
+      ? Math.max(0, vids.findIndex(v => v.season === (s ?? 1) && v.episode === (e ?? 1))) : 0;
+    upsertCont({ ...curMeta, type:modalType }, s ?? null, e ?? null, idx);
+    currentId = curMeta.id;
+    $$(".ep").forEach(el => el.classList.toggle("now", +el.dataset.e === e));
+  }
+}
+
+async function loadTorrents(title, imdb) {
+  $("#dl").innerHTML = `<p class="kv">scraping…</p>`;
+  const cat = modalType === "series" ? "205" : "207";
+  const list = [];
+  const [bay, yts] = await Promise.allSettled([
+    getJSON(`${APIBAY}/q.php?q=${encodeURIComponent(title)}&cat=${cat}`, 1),
+    getJSON(`${YTS}?limit=30&sort_by=seeds&order_by=desc&query_term=${encodeURIComponent(imdb)}`, 1),
+  ]);
+  if (bay.status === "fulfilled" && Array.isArray(bay.value))
+    for (const x of bay.value) {
+      if (!x.info_hash || x.id === "0") continue;
+      list.push({ name:x.name, hash:x.info_hash, size:x.size, seeds:+x.seeders, q:qOf(x.name) });
+    }
+  if (yts.status === "fulfilled")
+    for (const m of yts.value?.data?.movies || []) for (const tt of m.torrents || [])
+      list.push({ name:`${m.title_long} [${tt.quality}]`, hash:tt.hash, size:tt.size_bytes, seeds:+tt.seeds, q:tt.quality });
+  const seen = new Set();
+  const rows = list.filter(x => x.hash && !seen.has(x.hash) && seen.add(x.hash))
+    .sort((a,b) => b.seeds - a.seeds).slice(0, 40);
+  $("#dl").innerHTML = rows.length
+    ? rows.map(r=>`<div class="trow"><span class="q">${esc(r.q||"—")}</span>
+        <span class="sz">${esc(bytes(r.size))} · ${esc(r.name.slice(0,58))}</span>
+        <span class="sd">▲ ${r.seeds}</span>
+        <button data-m="${esc(magnet(r.hash,r.name))}">Magnet</button></div>`).join("")
+    : `<p class="kv">No releases found. Try a different title.</p>`;
+  $("#dl").onclick = e => {
+    const b = e.target.closest("[data-m]");
+    if (!b) return;
+    navigator.clipboard?.writeText(b.dataset.m)
+      .then(()=>toast("Magnet copied","ok")).catch(()=>toast("Copy blocked","err"));
+  };
+}
+
+function toggleList(o, btn) {
+  const l = myList();
+  const i = l.findIndex(x => x.id === o.id);
+  i > -1 ? l.splice(i,1) : l.push(o);
+  write(LS_LIST, l);
+  $$(`[data-fav="${o.id}"]`).forEach(b => b.classList.toggle("on", i === -1));
+  if (btn) btn.textContent = i === -1 ? "✓ Saved" : "+ My List";
+  i === -1 ? SFX.chime(true) : SFX.chime(false);
+  toast(i === -1 ? "Added to My List" : "Removed");
+}
+
+function closeDetail() {
+  if (!$("#modal").classList.contains("on")) return;
+  SFX.whoosh(false);
+  $("#modal").classList.remove("on");
+  $("#scrim").classList.remove("on");
+  $("#modal").innerHTML = "";
+  $("#modal").setAttribute("aria-hidden", "true");
+  curMeta = null;
+  currentId = null;
+  renderContinue();
+}
+
+/* ══════════════════ EFFECTS ══════════════════ */
+function ripple(el, ev) {
+  if (!el || el.dataset.noripple) return;
+  const r = el.getBoundingClientRect();
+  const s = Math.max(r.width, r.height);
+  const span = document.createElement("span");
+  span.className = "ripple";
+  span.style.width = span.style.height = s + "px";
+  span.style.left = (ev.clientX - r.left) + "px";
+  span.style.top = (ev.clientY - r.top) + "px";
+  el.appendChild(span);
+  setTimeout(() => span.remove(), 600);
+}
+
+document.addEventListener("pointerdown", e => {
+  const target = e.target.closest(".btn, .chips button, .servers button, .trow button, .rowfail button");
+  if (target) ripple(target, e);
+});
+
+document.addEventListener("click", e => {
+  const t = e.target.closest(".btn, .iconbtn, .chips button, .tabs button, .servers button, .trow button, .ep");
+  if (t) SFX.thock(t.classList.contains("light") ? 1.1 : 0.85);
+});
+
+/* typing ticks */
+document.addEventListener("keydown", e => {
+  const tag = document.activeElement?.tagName;
+  const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+  if (typing || e.key.length === 1 || e.key === "Backspace" || e.key === "Enter") SFX.key();
+});
+
+/* ══════════════════ EVENTS ══════════════════ */
+document.addEventListener("click", e => {
+  const kill = e.target.closest("[data-kill]");
+  if (kill) { e.stopPropagation(); SFX.thud(); removeCont(kill.dataset.kill); return; }
+
+  const retry = e.target.closest("[data-retry]");
+  if (retry) {
+    const id = retry.dataset.retry;
+    const el = document.getElementById(id);
+    const steps = JSON.parse(el.dataset.steps || '[{}]');
+    el.innerHTML = Array.from({length:8},()=>'<div class="sk"></div>').join("");
+    SFX.tick();
+    fillRow(id, retry.dataset.type, steps);
+    return;
+  }
+
+  const fav = e.target.closest("[data-fav]");
+  if (fav && !fav.closest("#modal")) {
+    e.stopPropagation();
+    const el = fav.closest(".card");
+    toggleList({ id:fav.dataset.fav, type:el.dataset.type,
+      name:el.querySelector(".t")?.textContent || el.querySelector(".cap")?.textContent || "",
+      poster:el.querySelector("img")?.getAttribute("src") || "" }, null);
+    return;
+  }
+  const pl = e.target.closest("[data-play]");
+  if (pl) { e.stopPropagation(); openDetail(pl.dataset.play, pl.dataset.ptype); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { e.stopPropagation(); openDetail(op.dataset.open, op.dataset.ot); return; }
+  const c = e.target.closest(".card");
+  if (c && !c.closest("#modal")) openDetail(c.dataset.id, c.dataset.type);
+});
+
+$("#scrim").onclick = closeDetail;
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+addEventListener("scroll", () => $("#nav").classList.toggle("solid", scrollY > 40));
+
+$("#navLinks").onclick = e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  $$("#navLinks button").forEach(x => x.classList.toggle("on", x === b));
+  const p = b.dataset.page;
+  SFX.whoosh(true);
+  scrollTo({ top:0, behavior:"smooth" });
+  if (p === "home") renderHome();
+  else if (p === "list") renderList();
+  else renderBrowse(p === "movies" ? "movie" : "series");
+};
+$("#searchBtn").onclick = () => { SFX.tick(0.6); renderSearch(); };
+
+/* sound controls */
+const sndBtn = $("#sndBtn");
+const syncSnd = () => {
+  sndBtn.classList.toggle("off", SFX.muted);
+  sndBtn.textContent = SFX.muted ? "🔇" : "♪";
+  sndBtn.title = SFX.muted ? "Sound off" : "Sound on";
+};
+syncSnd();
+sndBtn.onclick = () => { SFX.toggleMute(); syncSnd(); };
+sndBtn.oncontextmenu = e => { e.preventDefault(); $("#volpop").classList.toggle("on"); };
+$("#vol").value = Math.round(SFX.vol * 100);
+$("#vol").oninput = e => SFX.setVol(+e.target.value / 100);
+$("#vol").onchange = () => SFX.tick(0.6);
+document.addEventListener("click", e => {
+  if (!e.target.closest("#volpop") && !e.target.closest("#sndBtn")) $("#volpop").classList.remove("on");
+});
+
+/* ══════════════════ BOOT ══════════════════ */
+renderHome();
+})();
+</script>
 </body>
 </html>
