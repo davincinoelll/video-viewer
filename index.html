@@ -242,9 +242,12 @@ h2.page{padding:112px 4% 0;font-size:clamp(24px,3.4vw,36px)}
 .player{position:relative;width:100%;padding-bottom:56.25%;background:#000}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .player .note{position:absolute;inset:0;display:grid;place-items:center;padding:22px;text-align:center;
-  font-size:12.5px;color:var(--dim2);pointer-events:none;z-index:2}
+  font-size:12.5px;color:var(--dim2);pointer-events:none;z-index:2;
+  background:rgba(5,5,7,.6);backdrop-filter:blur(3px)}
 .srv,.pfoot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:11px 28px;font-size:11.5px;
   color:var(--dim2);border-top:1px solid var(--line)}
+.pfoot a{color:var(--dim);border-bottom:1px dotted var(--line2);transition:.2s}
+.pfoot a:hover{color:var(--txt);border-color:var(--vi)}
 .srv .lab{font-size:10px;letter-spacing:.13em;text-transform:uppercase}
 .pfoot span{margin-right:auto}
 .srv button,.pfoot button{padding:6px 13px;border-radius:99px;border:1px solid var(--line2);font-size:11.5px;
@@ -455,13 +458,18 @@ const IT  = "https://itunes.apple.com/us/rss";
 const JK  = "https://api.jikan.moe/v4";
 
 const SERVERS = [
-  { n:"VidSrc",  m:id=>`https://vidsrc.sh/embed/movie/${id}`,             t:(id,s,e)=>`https://vidsrc.sh/embed/tv/${id}/${s}/${e}` },
-  { n:"2Embed",  m:id=>`https://www.2embed.cc/embed/${id}`,               t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
-  { n:"VidSrc²", m:id=>`https://vidsrc.ir/embed/movie/${id}?autoplay=1`,  t:(id,s,e)=>`https://vidsrc.ir/embed/tv/${id}/${s}/${e}?autoplay=1` },
-  { n:"CC",      m:id=>`https://vidsrc.cc/v2/embed/movie/${id}`,          t:(id,s,e)=>`https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
-  { n:"Super",   m:id=>`https://multiembed.mov/?video_id=${id}`,          t:(id,s,e)=>`https://multiembed.mov/?video_id=${id}&s=${s}&e=${e}` },
-  { n:"AutoEmbed", m:id=>`https://player.autoembed.cc/embed/movie/${id}`, t:(id,s,e)=>`https://player.autoembed.cc/embed/tv/${id}/${s}/${e}` },
-  { n:"Smashy",  m:id=>`https://player.smashy.stream/movie/${id}`,        t:(id,s,e)=>`https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` }
+  { n:"VidSrc",   m:id=>`https://vidsrc.to/embed/movie/${id}`,          t:(id,s,e)=>`https://vidsrc.to/embed/tv/${id}/${s}/${e}` },
+  { n:"VidLink",  m:id=>`https://vidlink.pro/movie/${id}?autoplay=true`, t:(id,s,e)=>`https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true` },
+  { n:"Embed.su", m:id=>`https://embed.su/embed/movie/${id}`,           t:(id,s,e)=>`https://embed.su/embed/tv/${id}/${s}/${e}` },
+  { n:"VidSrc²",  m:id=>`https://vidsrc.net/embed/movie/${id}`,         t:(id,s,e)=>`https://vidsrc.net/embed/tv/${id}/${s}/${e}` },
+  { n:"VidSrc³",  m:id=>`https://vidsrc.mov/embed/movie/${id}`,         t:(id,s,e)=>`https://vidsrc.mov/embed/tv/${id}/${s}/${e}` },
+  { n:"VSRC",     m:id=>`https://vsrc.su/embed/movie/${id}`,            t:(id,s,e)=>`https://vsrc.su/embed/tv/${id}/${s}/${e}` },
+  { n:"VidSrc⁴",  m:id=>`https://vidsrc.icu/embed/movie/${id}`,         t:(id,s,e)=>`https://vidsrc.icu/embed/tv/${id}/${s}/${e}` },
+  { n:"VidSrc⁵",  m:id=>`https://vidsrc.sh/embed/movie/${id}`,          t:(id,s,e)=>`https://vidsrc.sh/embed/tv/${id}/${s}/${e}` },
+  { n:"Smashy",   m:id=>`https://player.smashy.stream/movie/${id}`,     t:(id,s,e)=>`https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` },
+  { n:"AutoEmbed",m:id=>`https://player.autoembed.cc/embed/movie/${id}`,t:(id,s,e)=>`https://player.autoembed.cc/embed/tv/${id}/${s}/${e}` },
+  { n:"2Embed",   m:id=>`https://www.2embed.cc/embed/${id}`,            t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
+  { n:"Super",    m:id=>`https://multiembed.mov/?video_id=${id}&tmdb=0`,t:(id,s,e)=>`https://multiembed.mov/?video_id=${id}&tmdb=0&s=${s}&e=${e}` }
 ];
 
 const GENRES = ["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama",
@@ -1521,12 +1529,12 @@ function renderSearch() {
 }
 
 /* ════ DETAIL ═════════════════════════════════════════════ */
-let mId = null, mType = null, mSeason = 1, mServer = 0, meta = null, lastUrl = "", tries = 0;
+let mId = null, mType = null, mSeason = 1, mServer = 0, meta = null, lastUrl = "", tries = 0, autoTries = 0;
 let lastS = 1, lastE = 1;
 
 async function openDetail(id, type, autoplay) {
   killPrev();
-  mId = id; mType = type; mServer = 0; tries = 0; lastUrl = "";
+  mId = id; mType = type; mServer = 0; tries = 0; autoTries = 0; lastUrl = "";
   SFX.whoosh();
   $("#sheet").classList.add("on"); $("#scrim").classList.add("on");
   $("#sheet").setAttribute("aria-hidden", "false");
@@ -1648,7 +1656,12 @@ function drawSeason(n, episodes) {
 async function play(s, e, auto = false) {
   if (!meta) return;
   const box = $("#pbox"); if (!box) return;
-  if (!auto) tries = 0;
+
+  if (!auto) {
+    tries = 0; autoTries = 0;
+    const saved = +store.get("n_srv", 0);
+    if (Number.isFinite(saved) && saved >= 0 && saved < SERVERS.length) mServer = saved;
+  }
   lastS = Math.max(1, s ?? 1); lastE = Math.max(1, e ?? 1);
 
   if (!meta.imdb) {
@@ -1666,29 +1679,44 @@ async function play(s, e, auto = false) {
 
   if (mServer >= SERVERS.length) mServer = 0;
   const srv = SERVERS[mServer];
-  const url = mType === "series" ? srv.t(meta.imdb, lastS, lastE) : srv.m(meta.imdb);
+  const urlFor = x => (mType === "series" ? x.t(meta.imdb, lastS, lastE) : x.m(meta.imdb));
+  const url = urlFor(srv);
   lastUrl = url;
-  if (!auto) store.set("n_srv", srv.n);
+  if (!auto) store.set("n_srv", mServer);
 
   box.innerHTML = `<div class="srv" id="srvRow"><span class="lab">Server</span>${SERVERS.map((x,i) =>
       `<button class="${i===mServer?"on":""}" data-s="${i}">${esc(x.n)}</button>`).join("")}</div>
     <div class="player"><iframe id="fr" src="${esc(url)}" allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
       allowfullscreen referrerpolicy="origin"></iframe>
       <div class="note" id="note">Connecting to ${esc(srv.n)}…</div></div>
-    <div class="pfoot"><span>Blank screen? Switch server or open in a tab.</span>
+    <div class="pfoot"><span id="pmsg">Blank screen? Switch server or open in a tab.</span>
       <button id="nextS">Next server</button><button id="openT">Open in new tab</button></div>`;
 
-  const fr = $("#fr"), note = $("#note");
-  let settled = false;
-  const wd = setTimeout(() => {
-    if (settled || !document.body.contains(fr)) return;
-    if (tries < SERVERS.length - 1) {
-      tries++; mServer = (mServer + 1) % SERVERS.length;
-      if (note) note.textContent = "That one isn't answering — switching…";
-      play(lastS, lastE, true);
-    } else if (note) note.textContent = "Nothing loaded. Try Open in new tab.";
-  }, 11000);
-  fr.addEventListener("load", () => { settled = true; clearTimeout(wd); note?.remove(); }, { once:true });
+  const fr = $("#fr"), note = $("#note"), t0 = Date.now();
+  let done = false, wd = null;
+  const clearNote = () => { clearTimeout(wd); note?.remove(); };
+
+  const giveUp = () => {
+    const m = $("#pmsg"); if (!m) return;
+    m.innerHTML = `Auto-switch stopped. Open directly: ` + SERVERS.map(x =>
+      `<a href="${esc(urlFor(x))}" target="_blank" rel="noopener noreferrer">${esc(x.n)}</a>`).join(" ");
+  };
+
+  const advance = () => {
+    if (done || !document.body.contains(fr)) return;
+    done = true; clearNote();
+    if (autoTries < 3) { autoTries++; mServer = (mServer + 1) % SERVERS.length; play(lastS, lastE, true); }
+    else giveUp();
+  };
+
+  wd = setTimeout(advance, auto ? 6000 : 9000);
+
+  fr.addEventListener("load", () => {
+    if (done) return;
+    // a blocked or dead embed fires load almost instantly with an empty document
+    if (Date.now() - t0 < 1200) setTimeout(() => { if (!done) advance(); }, 2400);
+    else { done = true; clearNote(); }
+  }, { once: true });
 
   $("#srvRow").onclick = ev => { const b = ev.target.closest("button"); if (b) { mServer = +b.dataset.s; play(lastS, lastE); } };
   $("#nextS").onclick = () => { mServer = (mServer + 1) % SERVERS.length; play(lastS, lastE); };
@@ -1746,7 +1774,7 @@ function closeDetail() {
   SFX.whoosh();
   $("#sheet").classList.remove("on"); $("#scrim").classList.remove("on");
   $("#sheet").innerHTML = ""; $("#sheet").setAttribute("aria-hidden", "true");
-  meta = null; watching = null; lastUrl = ""; tries = 0;
+  meta = null; watching = null; lastUrl = ""; tries = 0; autoTries = 0;
   drawContinue();
 }
 
