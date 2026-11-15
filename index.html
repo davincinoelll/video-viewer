@@ -223,8 +223,15 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 .mrow .match{color:var(--ok);font-weight:700}
 .tagline{font-size:11px;padding:2px 8px;border:1px solid var(--line2);border-radius:99px;color:var(--dim)}
 .tagline.resume{color:#ffd7a8;border-color:rgba(243,168,107,.4);background:rgba(243,168,107,.1)}
-.player{aspect-ratio:16/9;background:#000;border-bottom:1px solid var(--line)}
-.player iframe{width:100%;height:100%;border:0}
+.player{position:relative;aspect-ratio:16/9;background:#000;border-bottom:1px solid var(--line)}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.player .boot{position:absolute;inset:0;display:grid;place-items:center;font-size:12.5px;color:var(--dim2);
+  pointer-events:none}
+.pfoot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 26px;border-bottom:1px solid var(--line);
+  font-size:11.5px;color:var(--dim2)}
+.pfoot span{margin-right:auto}
+.pfoot button{padding:5px 12px;border-radius:99px;border:1px solid var(--line2);font-size:11.5px;color:var(--dim);transition:.18s}
+.pfoot button:hover{color:var(--txt);border-color:var(--amber);background:rgba(243,168,107,.1)}
 .servers{display:flex;gap:7px;flex-wrap:wrap;padding:11px 26px;border-bottom:1px solid var(--line);align-items:center}
 .servers span{font-size:10.5px;color:var(--dim2);margin-right:4px;text-transform:uppercase;letter-spacing:.1em}
 .servers button{padding:5px 12px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--dim);transition:.18s}
@@ -280,7 +287,7 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   .links{gap:14px;font-size:13px}
   #bill{height:72vh;padding-bottom:12vh}
   .hero .body{padding:16px}
-  .sheet .pad,.tabs,.servers,.eps,.seasons{padding-left:16px;padding-right:16px}
+  .sheet .pad,.tabs,.servers,.eps,.seasons,.pfoot{padding-left:16px;padding-right:16px}
   .tabs{margin:0 16px}
   .card:hover{transform:none}
   .card .prev{display:none}
@@ -527,12 +534,40 @@ const RELAYS = [
 const TRACKERS = ["udp://tracker.opentrackr.org:1337/announce","udp://open.demonii.com:1337/announce",
   "udp://tracker.openbittorrent.com:6969/announce","udp://exodus.desync.com:6969/announce"];
 
+/* ── PLAYBACK SERVERS ───────────────────────────────────────────────
+   Domains move around, so each entry is isolated and swappable.
+   `kind` decides which id gets substituted:
+     "imdb" -> tt-id      "tmdb" -> numeric TMDB id
+   Every entry MUST expose m(id) for films and t(id, season, episode)
+   for series, and must return an https URL that allows framing.      */
 const SERVERS = [
-  { name:"VidSrc", kind:"imdb", m:id=>`https://vidsrc.mov/embed/movie/${id}`,   t:(id,s,e)=>`https://vidsrc.mov/embed/tv/${id}/${s}/${e}` },
-  { name:"2Embed", kind:"imdb", m:id=>`https://www.2embed.cc/embed/${id}`,      t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
-  { name:"VidLink", kind:"tmdb", m:id=>`https://vidlink.pro/movie/${id}`,        t:(id,s,e)=>`https://vidlink.pro/tv/${id}/${s}/${e}` },
-  { name:"Videasy", kind:"tmdb", m:id=>`https://player.videasy.net/movie/${id}`, t:(id,s,e)=>`https://player.videasy.net/tv/${id}/${s}/${e}` },
-  { name:"EmbedWave", kind:"tmdb", m:id=>`https://embedwave.cc/embed/movie/${id}`, t:(id,s,e)=>`https://embedwave.cc/embed/tv/${id}/${s}/${e}` },
+  { name:"VidSrc",     kind:"imdb",
+    m:id=>`https://vidsrc.sh/embed/movie/${id}?autoplay=1`,
+    t:(id,s,e)=>`https://vidsrc.sh/embed/tv/${id}/${s}/${e}?autoplay=1` },
+
+  { name:"VidSrc Alt", kind:"imdb",
+    m:id=>`https://vidsrc.ir/embed/movie/${id}?autoplay=1`,
+    t:(id,s,e)=>`https://vidsrc.ir/embed/tv/${id}/${s}/${e}?autoplay=1` },
+
+  { name:"VidLink",    kind:"tmdb",
+    m:id=>`https://vidlink.pro/movie/${id}?autoplay=true`,
+    t:(id,s,e)=>`https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true` },
+
+  { name:"Videasy",    kind:"tmdb",
+    m:id=>`https://player.videasy.net/movie/${id}`,
+    t:(id,s,e)=>`https://player.videasy.net/tv/${id}/${s}/${e}` },
+
+  { name:"EmbedWave",  kind:"tmdb",
+    m:id=>`https://embedwave.cc/embed/movie/${id}?autoplay=1`,
+    t:(id,s,e)=>`https://embedwave.cc/embed/tv/${id}/${s}/${e}?autoplay=1` },
+
+  { name:"2Embed",     kind:"imdb",
+    m:id=>`https://www.2embed.cc/embed/movie/${id}`,
+    t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
+
+  { name:"SuperEmbed", kind:"imdb",
+    m:id=>`https://multiembed.mov/?video_id=${id}`,
+    t:(id,s,e)=>`https://multiembed.mov/?video_id=${id}&s=${s}&e=${e}` },
 ];
 
 const GENRES = {
@@ -968,11 +1003,13 @@ function renderSearch() {
 }
 
 /* ═══════════ DETAIL ═══════════ */
-let modalId, modalType, season = 1, server = 0, curMeta = null;
+let modalId, modalType, season = 1, server = 0, curMeta = null, lastStreamUrl = "";
 
 async function openDetail(id, type) {
   modalId = id;
   modalType = type;
+  server = 0;
+  lastStreamUrl = "";
   SFX.whoosh(true);
   $("#modal").classList.add("on");
   $("#scrim").classList.add("on");
@@ -998,6 +1035,12 @@ async function openDetail(id, type) {
     const resumeSeason = cont?.season ?? seasons[0] ?? 1;
     const resumeEp = cont?.episode ?? 1;
     const bg = m.background || seed.background || "";
+
+    /* remember the server this person actually got working */
+    const usableNow = serversFor(m);
+    const remembered = store.get("rj_server", "");
+    const ri = usableNow.findIndex(x => x.name === remembered);
+    server = ri > 0 ? ri : 0;
 
     $("#modal").innerHTML = `<div class="sheet">
       <div class="hero">
@@ -1059,7 +1102,7 @@ async function openDetail(id, type) {
       $("#resumeLabel")?.remove();
     });
     $("#trBtn")?.addEventListener("click", () => {
-      $("#playerBox").innerHTML = `<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`;
+      $("#playerBox").innerHTML = `<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe></div>`;
     });
 
     $("#tabs").onclick = e => {
@@ -1106,18 +1149,72 @@ function drawSeason(n) {
   };
 }
 
+/* servers that can actually be used for this title:
+   TMDB-based ones need a TMDB id, so they are dropped when it's absent */
+function serversFor(meta) {
+  const tmdb = meta?.moviedb_id;
+  return SERVERS.filter(s => s.kind === "imdb" || tmdb);
+}
+
+/* build the iframe src for the given server/target */
+function streamUrl(srv, s, e) {
+  const id = srv.kind === "tmdb" ? curMeta?.moviedb_id : modalId;
+  if (!id) return "";
+  return modalType === "series"
+    ? srv.t(id, Math.max(1, s ?? 1), Math.max(1, e ?? 1))
+    : srv.m(id);
+}
+
 function play(s, e) {
   if (!curMeta) return;
-  const usable = SERVERS.filter(x => x.kind === "imdb" || curMeta.moviedb_id);
-  if (!usable.length) return toast("No playable source", "err");
-  if (server >= usable.length) server = 0;
-  const srv = usable[server];
-  const id = srv.kind === "tmdb" ? curMeta.moviedb_id : modalId;
-  const url = modalType === "series" ? srv.t(id, s ?? 1, e ?? 1) : srv.m(id);
+  const box = $("#playerBox");
+  if (!box) return;
 
-  $("#playerBox").innerHTML = `<div class="servers" id="srvRow"><span>Server</span>${
-    usable.map((x,i)=>`<button class="${i===server?"on":""}" data-s="${i}">${x.name}</button>`).join("")}</div>
-    <div class="player"><iframe src="${url}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="origin"></iframe></div>`;
+  const usable = serversFor(curMeta);
+  if (!usable.length) { toast("No playable source", "err"); return; }
+  if (server >= usable.length || server < 0) server = 0;
+
+  /* skip servers we can't address, so a missing TMDB id can't blank the player */
+  let srv = null, url = "";
+  for (let i = 0; i < usable.length; i++) {
+    const cand = usable[(server + i) % usable.length];
+    const u = streamUrl(cand, s, e);
+    if (u) { srv = cand; url = u; server = usable.indexOf(cand); break; }
+  }
+  if (!srv || !url) { toast("No playable source", "err"); return; }
+
+  lastStreamUrl = url;
+  store.set("rj_server", srv.name);
+
+  box.innerHTML = `<div class="servers" id="srvRow"><span>Server</span>${
+    usable.map((x,i)=>`<button class="${i===server?"on":""}" data-s="${i}">${esc(x.name)}</button>`).join("")}</div>
+    <div class="player">
+      <iframe id="streamFrame"
+        src="${esc(url)}"
+        title="player"
+        allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; gyroscope"
+        allowfullscreen webkitallowfullscreen mozallowfullscreen
+        referrerpolicy="no-referrer"
+        scrolling="no" frameborder="0"></iframe>
+      <div class="boot" id="bootNote">Connecting to ${esc(srv.name)}…</div>
+    </div>
+    <div class="pfoot">
+      <span>Blank or stuck? Try another server, or open it in a new tab.</span>
+      <button id="nextSrv">Next server</button>
+      <button id="openTab">Open in new tab</button>
+    </div>`;
+
+  const frame = $("#streamFrame");
+  const note = $("#bootNote");
+
+  const clearNote = () => note?.remove();
+  frame.addEventListener("load", clearNote, { once:true });
+  /* if the frame never reports a load, surface the fallback text */
+  setTimeout(() => {
+    if (!document.body.contains(frame) || !note) return;
+    note.textContent = `${srv.name} is taking a while — try Next server.`;
+  }, 9000);
+
   $("#srvRow").onclick = ev => {
     const b = isEl(ev.target) ? ev.target.closest("button") : null;
     if (!b) return;
@@ -1125,7 +1222,18 @@ function play(s, e) {
     server = +b.dataset.s;
     play(s, e);
   };
-  $("#playerBox").scrollIntoView({ behavior:"smooth", block:"center" });
+  $("#nextSrv").onclick = () => {
+    SFX.tick(0.6);
+    server = (server + 1) % usable.length;
+    play(s, e);
+  };
+  $("#openTab").onclick = () => {
+    if (!lastStreamUrl) return;
+    SFX.tick(0.6);
+    window.open(lastStreamUrl, "_blank", "noopener,noreferrer");
+  };
+
+  box.scrollIntoView({ behavior:"smooth", block:"start" });
 
   const vids = (curMeta.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
   const idx = modalType === "series"
@@ -1191,6 +1299,7 @@ function closeDetail() {
   $("#modal").setAttribute("aria-hidden", "true");
   curMeta = null;
   currentId = null;
+  lastStreamUrl = "";
   renderContinue();
 }
 
@@ -1210,13 +1319,13 @@ function ripple(el, ev) {
 
 document.addEventListener("pointerdown", e => {
   if (!isEl(e.target)) return;
-  const t = e.target.closest(".btn, .chips button, .servers button, .trow button, .rowfail button");
+  const t = e.target.closest(".btn, .chips button, .servers button, .pfoot button, .trow button, .rowfail button");
   if (t) ripple(t, e);
 });
 
 document.addEventListener("click", e => {
   if (!isEl(e.target)) return;
-  const t = e.target.closest(".btn, .iconbtn, .chips button, .tabs button, .servers button, .trow button, .ep");
+  const t = e.target.closest(".btn, .iconbtn, .chips button, .tabs button, .servers button, .pfoot button, .trow button, .ep");
   if (t) SFX.thock(t.classList.contains("light") ? 1.1 : 0.85);
 });
 
