@@ -174,7 +174,7 @@ main.view{animation:viewin .45s var(--ease)}
 .card.watched .bar i{background:var(--ok)}
 .cont-label{font-size:10px;color:var(--dim);margin-top:3px}
 .card .cap{display:none;font-size:11px;font-weight:600;line-height:1.3;margin-top:5px;color:var(--dim);
-  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  -webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 
 .sk{flex:0 0 auto;width:var(--cw);aspect-ratio:2/3;border-radius:var(--r);
   background:linear-gradient(100deg,#1d1713,#2b221b,#1d1713);background-size:220% 100%;animation:sh 1.5s linear infinite}
@@ -324,24 +324,64 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 (() => {
 "use strict";
 
-/* ══════════════════ SOUND ══════════════════
-   Everything is synthesized — no files to host. One AudioContext,
-   created on the first gesture so autoplay policy stays happy. */
+/* ═══════════ SAFE STORAGE ═══════════
+   localStorage throws in private mode and when storage is blocked,
+   which used to abort the whole script. Falls back to memory. */
+const store = (() => {
+  let mem = {}, live = true;
+  try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); }
+  catch { live = false; }
+  return {
+    get(k, d) {
+      try {
+        const raw = live ? localStorage.getItem(k) : mem[k];
+        return raw == null ? d : JSON.parse(raw);
+      } catch { return d; }
+    },
+    set(k, v) {
+      const raw = JSON.stringify(v);
+      mem[k] = raw;
+      try { if (live) localStorage.setItem(k, raw); }
+      catch { live = false; }
+    },
+  };
+})();
+
+/* ═══════════ SAFE TIMEOUT ═══════════
+   AbortSignal.timeout is missing on Safari <16 / Firefox <100. */
+function timeoutSignal(ms) {
+  try {
+    if (AbortSignal && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms);
+  } catch {}
+  const c = new AbortController();
+  setTimeout(() => { try { c.abort(); } catch {} }, ms);
+  return c.signal;
+}
+
+/* ═══════════ SOUND ═══════════ */
 const SFX = (() => {
-  let ctx = null, master = null;
-  let vol = parseFloat(localStorage.getItem("rj_vol") ?? "0.6");
-  let muted = localStorage.getItem("rj_mute") === "1";
-  let lastHover = 0;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const noop = () => {};
+  if (!AC) return { tick:noop, thock:noop, whoosh:noop, chime:noop, thud:noop,
+    hover:noop, key:noop, setVol:noop, toggleMute:() => false, boot:noop,
+    muted:false, vol:0.6 };
+
+  let ctx = null, master = null, lastHover = 0;
+  const storedVol = store.get("rj_vol", 0.6);
+  let vol = Number.isFinite(storedVol) ? Math.min(1, Math.max(0, storedVol)) : 0.6;
+  let muted = store.get("rj_mute", false) === true;
 
   function boot() {
-    if (ctx) { if (ctx.state === "suspended") ctx.resume(); return ctx; }
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-    ctx = new AC();
-    master = ctx.createGain();
-    master.gain.value = muted ? 0 : vol * 0.5;
-    master.connect(ctx.destination);
-    return ctx;
+    try {
+      if (!ctx) {
+        ctx = new AC();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : vol * 0.5;
+        master.connect(ctx.destination);
+      }
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      return ctx;
+    } catch { return null; }
   }
   const now = () => ctx.currentTime;
 
@@ -359,127 +399,119 @@ const SFX = (() => {
     g.gain.exponentialRampToValueAtTime(Math.max(peak, 0.0002), at + attack);
     g.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
   }
+  const ready = () => !!boot() && !muted;
 
-  /* soft mechanical tick — keys and hovers */
   function tick(gain = 0.5, pitch = 1) {
-    if (!boot() || muted) return;
-    const t = now();
-    const n = noise(0.02);
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.frequency.value = 2400 * pitch;
-    bp.Q.value = 1.4;
-    const g = ctx.createGain();
-    env(g, 0.09 * gain, 0.001, 0.028, t);
-    n.connect(bp).connect(g).connect(master);
-    n.start(t);
-    const o = ctx.createOscillator();
-    o.type = "square";
-    o.frequency.value = 1500 * pitch;
-    const og = ctx.createGain();
-    env(og, 0.03 * gain, 0.001, 0.014, t);
-    o.connect(og).connect(master);
-    o.start(t); o.stop(t + 0.04);
-  }
-
-  /* rounded "thock" for clicks */
-  function thock(gain = 1) {
-    if (!boot() || muted) return;
-    const t = now();
-    const o = ctx.createOscillator();
-    o.type = "sine";
-    o.frequency.setValueAtTime(300, t);
-    o.frequency.exponentialRampToValueAtTime(115, t + 0.09);
-    const g = ctx.createGain();
-    env(g, 0.16 * gain, 0.004, 0.1, t);
-    o.connect(g).connect(master);
-    o.start(t); o.stop(t + 0.16);
-    const n = noise(0.035);
-    const lp = ctx.createBiquadFilter();
-    lp.type = "lowpass";
-    lp.frequency.value = 1100;
-    const ng = ctx.createGain();
-    env(ng, 0.07 * gain, 0.002, 0.035, t);
-    n.connect(lp).connect(ng).connect(master);
-    n.start(t);
-  }
-
-  /* airy sweep for opening things */
-  function whoosh(up = true) {
-    if (!boot() || muted) return;
-    const t = now();
-    const n = noise(0.34);
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.Q.value = 0.8;
-    bp.frequency.setValueAtTime(up ? 260 : 1500, t);
-    bp.frequency.exponentialRampToValueAtTime(up ? 1900 : 240, t + 0.32);
-    const g = ctx.createGain();
-    env(g, 0.09, 0.05, 0.28, t);
-    n.connect(bp).connect(g).connect(master);
-    n.start(t);
-  }
-
-  /* two-note chime for confirms */
-  function chime(up = true) {
-    if (!boot() || muted) return;
-    const t = now();
-    [up ? 660 : 520, up ? 990 : 390].forEach((f, i) => {
-      const o = ctx.createOscillator();
-      o.type = "triangle";
-      o.frequency.value = f;
+    if (!ready()) return;
+    try {
+      const t = now();
+      const n = noise(0.02);
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass"; bp.frequency.value = 2400 * pitch; bp.Q.value = 1.4;
       const g = ctx.createGain();
-      env(g, 0.075, 0.008, 0.24, t + i * 0.07);
+      env(g, 0.09 * gain, 0.001, 0.028, t);
+      n.connect(bp).connect(g).connect(master);
+      n.start(t);
+      const o = ctx.createOscillator();
+      o.type = "square"; o.frequency.value = 1500 * pitch;
+      const og = ctx.createGain();
+      env(og, 0.03 * gain, 0.001, 0.014, t);
+      o.connect(og).connect(master);
+      o.start(t); o.stop(t + 0.05);
+    } catch {}
+  }
+  function thock(gain = 1) {
+    if (!ready()) return;
+    try {
+      const t = now();
+      const o = ctx.createOscillator();
+      o.type = "sine";
+      o.frequency.setValueAtTime(300, t);
+      o.frequency.exponentialRampToValueAtTime(115, t + 0.09);
+      const g = ctx.createGain();
+      env(g, 0.16 * gain, 0.004, 0.1, t);
       o.connect(g).connect(master);
-      o.start(t + i * 0.07);
-      o.stop(t + i * 0.07 + 0.3);
-    });
+      o.start(t); o.stop(t + 0.17);
+      const n = noise(0.035);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass"; lp.frequency.value = 1100;
+      const ng = ctx.createGain();
+      env(ng, 0.07 * gain, 0.002, 0.035, t);
+      n.connect(lp).connect(ng).connect(master);
+      n.start(t);
+    } catch {}
   }
-
-  /* low thud for removal / error */
+  function whoosh(up = true) {
+    if (!ready()) return;
+    try {
+      const t = now();
+      const n = noise(0.34);
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass"; bp.Q.value = 0.8;
+      bp.frequency.setValueAtTime(up ? 260 : 1500, t);
+      bp.frequency.exponentialRampToValueAtTime(up ? 1900 : 240, t + 0.32);
+      const g = ctx.createGain();
+      env(g, 0.09, 0.05, 0.28, t);
+      n.connect(bp).connect(g).connect(master);
+      n.start(t);
+    } catch {}
+  }
+  function chime(up = true) {
+    if (!ready()) return;
+    try {
+      const t = now();
+      [up ? 660 : 520, up ? 990 : 390].forEach((f, i) => {
+        const o = ctx.createOscillator();
+        o.type = "triangle"; o.frequency.value = f;
+        const g = ctx.createGain();
+        env(g, 0.075, 0.008, 0.24, t + i * 0.07);
+        o.connect(g).connect(master);
+        o.start(t + i * 0.07); o.stop(t + i * 0.07 + 0.32);
+      });
+    } catch {}
+  }
   function thud() {
-    if (!boot() || muted) return;
-    const t = now();
-    const o = ctx.createOscillator();
-    o.type = "sine";
-    o.frequency.setValueAtTime(150, t);
-    o.frequency.exponentialRampToValueAtTime(62, t + 0.16);
-    const g = ctx.createGain();
-    env(g, 0.15, 0.005, 0.17, t);
-    o.connect(g).connect(master);
-    o.start(t); o.stop(t + 0.24);
+    if (!ready()) return;
+    try {
+      const t = now();
+      const o = ctx.createOscillator();
+      o.type = "sine";
+      o.frequency.setValueAtTime(150, t);
+      o.frequency.exponentialRampToValueAtTime(62, t + 0.16);
+      const g = ctx.createGain();
+      env(g, 0.15, 0.005, 0.17, t);
+      o.connect(g).connect(master);
+      o.start(t); o.stop(t + 0.25);
+    } catch {}
   }
-
   function hover() {
     const t = performance.now();
     if (t - lastHover < 110) return;
     lastHover = t;
     tick(0.3, 1.15 + Math.random() * 0.3);
   }
-
   function key() { tick(0.42, 0.9 + Math.random() * 0.45); }
 
   function setVol(v) {
-    vol = v;
-    localStorage.setItem("rj_vol", String(v));
+    vol = Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0.6;
+    store.set("rj_vol", vol);
     if (master) master.gain.value = muted ? 0 : vol * 0.5;
   }
   function toggleMute() {
     muted = !muted;
-    localStorage.setItem("rj_mute", muted ? "1" : "0");
+    store.set("rj_mute", muted);
     if (master) master.gain.value = muted ? 0 : vol * 0.5;
     if (!muted) chime(true);
     return muted;
   }
-  return { tick, thock, whoosh, chime, thud, hover, key, setVol, toggleMute,
-    get muted() { return muted; }, get vol() { return vol; }, boot };
+  return { tick, thock, whoosh, chime, thud, hover, key, setVol, toggleMute, boot,
+    get muted() { return muted; }, get vol() { return vol; } };
 })();
 
-/* first gesture unlocks audio */
 addEventListener("pointerdown", () => SFX.boot(), { once:true });
 addEventListener("keydown", () => SFX.boot(), { once:true });
 
-/* ══════════════════ SOURCES ══════════════════ */
+/* ═══════════ SOURCES ═══════════ */
 const CM      = "https://v3-cinemeta.strem.io";
 const METAHUB = "https://images.metahub.space";
 const APIBAY  = "https://apibay.org";
@@ -508,9 +540,10 @@ const GENRES = {
   series:["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama","Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western","Reality-TV","Talk-Show","Game-Show"],
 };
 
-/* ══════════════════ UTIL ══════════════════ */
+/* ═══════════ UTIL ═══════════ */
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
+const isEl = n => n instanceof Element;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const bytes = n => { n=+n||0; const u=["B","KB","MB","GB","TB"]; let i=0; while(n>=1024&&i<4){n/=1024;i++;} return n.toFixed(i?1:0)+" "+u[i]; };
 const magnet = (h,n) => "magnet:?xt=urn:btih:"+h+"&dn="+encodeURIComponent(n||"")+TRACKERS.map(t=>"&tr="+encodeURIComponent(t)).join("");
@@ -518,32 +551,37 @@ const qOf = s => (/2160p|4k|uhd/i.test(s)?"2160p":/1080p/i.test(s)?"1080p":/720p
 const yearOf = it => (it.releaseInfo || it.year || "").toString().slice(0,4);
 const pctOf = it => it.imdbRating ? Math.round(parseFloat(it.imdbRating) * 10) : 0;
 const minsOf = rt => { const n = parseInt(String(rt||"").replace(/\D+/g,""), 10); return Number.isFinite(n) && n > 0 ? n : 0; };
-const toast = (m,k="") => {
-  const t = document.createElement("div");
-  t.className = "toast " + k; t.textContent = m;
-  $("#toasts").appendChild(t);
-  k === "err" ? SFX.thud() : SFX.tick(0.4, 1.2);
-  setTimeout(()=>{t.style.opacity=0;t.style.transform="translateY(10px)";setTimeout(()=>t.remove(),300);},2200);
-};
 const clamp = (n,a,b) => Math.min(b, Math.max(a, n));
 const human = ms => { const m = Math.round(ms/60000); return m >= 60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; };
+
+function toast(m, k = "") {
+  const host = $("#toasts");
+  if (!host) return;
+  const t = document.createElement("div");
+  t.className = "toast " + k;
+  t.textContent = m;
+  host.appendChild(t);
+  k === "err" ? SFX.thud() : SFX.tick(0.4, 1.2);
+  setTimeout(() => {
+    t.style.opacity = 0;
+    t.style.transform = "translateY(10px)";
+    setTimeout(() => t.remove(), 300);
+  }, 2200);
+}
 
 const posterLadder = id => [`${METAHUB}/poster/medium/${id}/img`, `${METAHUB}/poster/small/${id}/img`];
 const posterAttrs = (id, title) =>
   `loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${esc(posterLadder(id)[0])}"
    data-lad="${esc(id)}" data-step="0" data-title="${esc(title)}" alt="${esc(title)}"`;
 
-/* ══════════════════ STORE ══════════════════ */
-const LS_LIST = "rj_list", LS_CONT = "rj_cont";
-const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || "null"); return v ?? d; } catch { return d; } };
-const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-const myList = () => read(LS_LIST, []);
-const inList = id => myList().some(x => x.id === id);
-const contList = () => read(LS_CONT, []);
+/* ═══════════ STORE ═══════════ */
+const myList   = () => store.get("rj_list", []);
+const inList   = id => myList().some(x => x.id === id);
+const contList = () => store.get("rj_cont", []);
 
 function saveCont(list) {
   const now = Date.now();
-  write(LS_CONT, list.filter(c => now - c.updatedAt < 60 * 864e5)
+  store.set("rj_cont", list.filter(c => now - c.updatedAt < 60 * 864e5)
     .sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 24));
 }
 function progressOf(c) {
@@ -574,20 +612,22 @@ function upsertCont(item, season, episode, epIndex) {
 }
 function removeCont(id) {
   saveCont(contList().filter(c => c.id !== id));
-  renderContinue();
-  $$(`.card[data-id="${CSS.escape(id)}"]`).forEach(el => {
-    el.style.transition = "opacity .25s, transform .25s";
-    el.style.opacity = "0"; el.style.transform = "scale(.9)";
-    setTimeout(() => el.remove(), 260);
+  const nodes = $$(`.card[data-id="${CSS.escape(id)}"]`);
+  nodes.forEach(el => {
+    el.style.transition = "opacity .22s, transform .22s";
+    el.style.opacity = "0";
+    el.style.transform = "scale(.9)";
   });
+  setTimeout(() => { renderContinue(); nodes.forEach(n => n.remove()); }, 230);
   toast("Removed from Continue Watching");
 }
 
-/* ══════════════════ TRANSPORT ══════════════════ */
+/* ═══════════ TRANSPORT ═══════════ */
 let directOK = null;
 const cache = new Map();
+
 async function tryRoute(route, url) {
-  const r = await fetch(route.fn(url), { signal: AbortSignal.timeout(route.id === "direct" ? 7000 : 14000) });
+  const r = await fetch(route.fn(url), { signal: timeoutSignal(route.id === "direct" ? 7000 : 14000) });
   if (!r.ok) throw new Error(route.id + " " + r.status);
   return r.json();
 }
@@ -620,7 +660,7 @@ const catalog = (type, o = {}) => {
 const metaOf = (type, id) => getJSON(`${CM}/meta/${type}/${id}.json`, 1).then(j => j.meta || j);
 const itemCache = new Map();
 
-/* ══════════════════ CARD ══════════════════ */
+/* ═══════════ CARD ═══════════ */
 function card(o, opts = {}) {
   const type = o.type === "series" ? "series" : "movie";
   const title = o.name || "Untitled";
@@ -663,16 +703,17 @@ document.addEventListener("error", e => {
   const ladder = posterLadder(img.dataset.lad);
   if (step < ladder.length) { img.dataset.step = step; img.src = ladder[step]; return; }
   const ph = document.createElement("div");
-  ph.className = "ph"; ph.textContent = img.dataset.title || "";
+  ph.className = "ph";
+  ph.textContent = img.dataset.title || "";
   img.replaceWith(ph);
 }, true);
 
-/* hover: soft tick + trailer preview */
 let prevTimer, prevEl, prevId;
 document.addEventListener("mouseover", e => {
-  const c = e.target.closest?.(".card");
+  if (!isEl(e.target)) return;
+  const c = e.target.closest(".card");
   if (!c || c.closest("#modal")) return;
-  if (window.matchMedia("(pointer:coarse)").matches) return;
+  if (window.matchMedia && window.matchMedia("(pointer:coarse)").matches) return;
   if (prevId === c.dataset.id) return;
   prevId = c.dataset.id;
   SFX.hover();
@@ -692,7 +733,8 @@ document.addEventListener("mouseover", e => {
   }, 900);
 });
 document.addEventListener("mouseout", e => {
-  const c = e.target.closest?.(".card");
+  if (!isEl(e.target)) return;
+  const c = e.target.closest(".card");
   if (c && !c.contains(e.relatedTarget)) {
     clearTimeout(prevTimer);
     prevId = null;
@@ -700,7 +742,7 @@ document.addEventListener("mouseout", e => {
   }
 });
 
-/* ══════════════════ BILLBOARD ══════════════════ */
+/* ═══════════ BILLBOARD ═══════════ */
 async function billboard() {
   try {
     const j = await catalog("movie");
@@ -733,7 +775,8 @@ async function billboard() {
         if (!t) return;
         const f = document.createElement("iframe");
         f.src = `https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&mute=1&controls=0&loop=1&playlist=${t.source}&modestbranding=1&playsinline=1`;
-        f.allow = "autoplay; encrypted-media"; f.title = "trailer";
+        f.allow = "autoplay; encrypted-media";
+        f.title = "trailer";
         $("#bill").prepend(f);
         requestAnimationFrame(() => f.classList.add("on"));
         $("#muteTgl")?.addEventListener("click", ev => {
@@ -747,12 +790,12 @@ async function billboard() {
   } catch {}
 }
 
-/* ══════════════════ CONTINUE WATCHING ══════════════════ */
+/* ═══════════ CONTINUE WATCHING ═══════════ */
 function renderContinue() {
-  const list = contList().filter(c => progressOf(c) < 97);
   const host = $("#contRow");
   if (!host) return;
-  if (!list.length) { host.classList.add("hide"); return; }
+  const list = contList().filter(c => progressOf(c) < 97);
+  if (!list.length) { host.classList.add("hide"); host.innerHTML = ""; return; }
   host.classList.remove("hide");
   host.innerHTML = `<div class="rowhead"><h2>Continue Watching</h2>
       <button class="more" id="clearCont">Clear all</button></div>
@@ -771,7 +814,7 @@ setInterval(() => {
   if (label) label.textContent = `${Math.round(100 - pct)}% left · ${human(open.expectedMs * (1 - pct/100))} remaining`;
 }, 15000);
 
-/* ══════════════════ ROWS ══════════════════ */
+/* ═══════════ ROWS ═══════════ */
 const rowShell = (t, id) => `<section class="row"><div class="rowhead"><h2>${esc(t)}</h2></div>
   <div class="rail" id="${id}">${Array.from({length:8},()=>'<div class="sk"></div>').join("")}</div></section>`;
 
@@ -818,6 +861,7 @@ const greeting = () => {
 
 function view(html) {
   const main = $("#main");
+  if (!main) return;
   main.innerHTML = html;
   main.classList.remove("view");
   void main.offsetWidth;
@@ -837,7 +881,7 @@ async function renderHome() {
   billboard();
 }
 
-/* ══════════════════ BROWSE / LIST / SEARCH ══════════════════ */
+/* ═══════════ BROWSE / LIST / SEARCH ═══════════ */
 async function renderBrowse(type) {
   $("#bill").classList.add("hide");
   view(`<h3 class="page-h">${type==="movie"?"Movies":"Series"}</h3>
@@ -858,7 +902,7 @@ async function renderBrowse(type) {
     }
   };
   $("#gchips").onclick = e => {
-    const b = e.target.closest("button");
+    const b = isEl(e.target) ? e.target.closest("button") : null;
     if (!b) return;
     SFX.tick(0.5);
     $$("#gchips button").forEach(c => c.classList.toggle("on", c === b));
@@ -877,13 +921,15 @@ function renderList() {
       : `<div class="empty" style="grid-column:1/-1"><b>Your list is empty</b>Tap the ★ on anything to keep it here.</div>`
     }</div>`);
   $("#expBtn")?.addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(items, null, 2)], { type:"application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "reeljack-list.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-    toast("List exported", "ok");
+    try {
+      const blob = new Blob([JSON.stringify(items, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "reeljack-list.json";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast("List exported", "ok");
+    } catch { toast("Export failed", "err"); }
   });
 }
 
@@ -895,6 +941,7 @@ function renderSearch() {
       background:rgba(255,238,220,.05);color:var(--txt);font-size:15px;outline:none;transition:.2s"></div>
     <div class="grid" id="sgrid"></div>`);
   const input = $("#sq");
+  if (!input) return;
   input.focus();
   input.onfocus = () => input.style.borderColor = "var(--amber)";
   input.onblur = () => input.style.borderColor = "var(--line2)";
@@ -920,11 +967,12 @@ function renderSearch() {
   };
 }
 
-/* ══════════════════ DETAIL ══════════════════ */
+/* ═══════════ DETAIL ═══════════ */
 let modalId, modalType, season = 1, server = 0, curMeta = null;
 
 async function openDetail(id, type) {
-  modalId = id; modalType = type;
+  modalId = id;
+  modalType = type;
   SFX.whoosh(true);
   $("#modal").classList.add("on");
   $("#scrim").classList.add("on");
@@ -1015,7 +1063,7 @@ async function openDetail(id, type) {
     });
 
     $("#tabs").onclick = e => {
-      const b = e.target.closest("button");
+      const b = isEl(e.target) ? e.target.closest("button") : null;
       if (!b) return;
       SFX.tick(0.5);
       $$("#tabs button").forEach(x => x.classList.toggle("on", x === b));
@@ -1040,7 +1088,9 @@ function drawSeason(n) {
   const videos = curMeta?.videos || [];
   const eps = videos.filter(v => v.season === n).sort((a,b) => a.episode - b.episode);
   const cont = contList().find(c => c.id === modalId);
-  $("#eps").innerHTML = eps.map(ep => {
+  const host = $("#eps");
+  if (!host) return;
+  host.innerHTML = eps.map(ep => {
     const isNow = cont && cont.season === n && cont.episode === ep.episode;
     const p = isNow ? progressOf(cont) : 0;
     return `<button class="ep ${isNow ? "now" : ""}" data-e="${ep.episode}">
@@ -1050,14 +1100,15 @@ function drawSeason(n) {
         <small>${esc((ep.firstAired||"").slice(0,10))}</small></span></span>
       ${p ? `<span class="bar"><i style="width:${p.toFixed(1)}%"></i></span>` : ""}</button>`;
   }).join("") || `<p class="kv">No episodes listed.</p>`;
-  $("#eps").onclick = e => {
-    const b = e.target.closest("[data-e]");
+  host.onclick = e => {
+    const b = isEl(e.target) ? e.target.closest("[data-e]") : null;
     if (b) { SFX.thock(); play(season, +b.dataset.e); }
   };
 }
 
 function play(s, e) {
-  const usable = SERVERS.filter(x => x.kind === "imdb" || curMeta?.moviedb_id);
+  if (!curMeta) return;
+  const usable = SERVERS.filter(x => x.kind === "imdb" || curMeta.moviedb_id);
   if (!usable.length) return toast("No playable source", "err");
   if (server >= usable.length) server = 0;
   const srv = usable[server];
@@ -1068,7 +1119,7 @@ function play(s, e) {
     usable.map((x,i)=>`<button class="${i===server?"on":""}" data-s="${i}">${x.name}</button>`).join("")}</div>
     <div class="player"><iframe src="${url}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="origin"></iframe></div>`;
   $("#srvRow").onclick = ev => {
-    const b = ev.target.closest("button");
+    const b = isEl(ev.target) ? ev.target.closest("button") : null;
     if (!b) return;
     SFX.tick(0.5);
     server = +b.dataset.s;
@@ -1076,18 +1127,18 @@ function play(s, e) {
   };
   $("#playerBox").scrollIntoView({ behavior:"smooth", block:"center" });
 
-  if (curMeta) {
-    const vids = (curMeta.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
-    const idx = modalType === "series"
-      ? Math.max(0, vids.findIndex(v => v.season === (s ?? 1) && v.episode === (e ?? 1))) : 0;
-    upsertCont({ ...curMeta, type:modalType }, s ?? null, e ?? null, idx);
-    currentId = curMeta.id;
-    $$(".ep").forEach(el => el.classList.toggle("now", +el.dataset.e === e));
-  }
+  const vids = (curMeta.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
+  const idx = modalType === "series"
+    ? Math.max(0, vids.findIndex(v => v.season === (s ?? 1) && v.episode === (e ?? 1))) : 0;
+  upsertCont({ ...curMeta, type:modalType }, s ?? null, e ?? null, idx);
+  currentId = curMeta.id;
+  $$(".ep").forEach(el => el.classList.toggle("now", +el.dataset.e === e));
 }
 
 async function loadTorrents(title, imdb) {
-  $("#dl").innerHTML = `<p class="kv">scraping…</p>`;
+  const host = $("#dl");
+  if (!host) return;
+  host.innerHTML = `<p class="kv">scraping…</p>`;
   const cat = modalType === "series" ? "205" : "207";
   const list = [];
   const [bay, yts] = await Promise.allSettled([
@@ -1105,17 +1156,18 @@ async function loadTorrents(title, imdb) {
   const seen = new Set();
   const rows = list.filter(x => x.hash && !seen.has(x.hash) && seen.add(x.hash))
     .sort((a,b) => b.seeds - a.seeds).slice(0, 40);
-  $("#dl").innerHTML = rows.length
+  host.innerHTML = rows.length
     ? rows.map(r=>`<div class="trow"><span class="q">${esc(r.q||"—")}</span>
         <span class="sz">${esc(bytes(r.size))} · ${esc(r.name.slice(0,58))}</span>
         <span class="sd">▲ ${r.seeds}</span>
         <button data-m="${esc(magnet(r.hash,r.name))}">Magnet</button></div>`).join("")
     : `<p class="kv">No releases found. Try a different title.</p>`;
-  $("#dl").onclick = e => {
-    const b = e.target.closest("[data-m]");
+  host.onclick = e => {
+    const b = isEl(e.target) ? e.target.closest("[data-m]") : null;
     if (!b) return;
     navigator.clipboard?.writeText(b.dataset.m)
-      .then(()=>toast("Magnet copied","ok")).catch(()=>toast("Copy blocked","err"));
+      .then(() => toast("Magnet copied", "ok"))
+      .catch(() => toast("Copy blocked", "err"));
   };
 }
 
@@ -1123,7 +1175,7 @@ function toggleList(o, btn) {
   const l = myList();
   const i = l.findIndex(x => x.id === o.id);
   i > -1 ? l.splice(i,1) : l.push(o);
-  write(LS_LIST, l);
+  store.set("rj_list", l);
   $$(`[data-fav="${o.id}"]`).forEach(b => b.classList.toggle("on", i === -1));
   if (btn) btn.textContent = i === -1 ? "✓ Saved" : "+ My List";
   i === -1 ? SFX.chime(true) : SFX.chime(false);
@@ -1142,9 +1194,9 @@ function closeDetail() {
   renderContinue();
 }
 
-/* ══════════════════ EFFECTS ══════════════════ */
+/* ═══════════ EFFECTS ═══════════ */
 function ripple(el, ev) {
-  if (!el || el.dataset.noripple) return;
+  if (!el) return;
   const r = el.getBoundingClientRect();
   const s = Math.max(r.width, r.height);
   const span = document.createElement("span");
@@ -1157,24 +1209,27 @@ function ripple(el, ev) {
 }
 
 document.addEventListener("pointerdown", e => {
-  const target = e.target.closest(".btn, .chips button, .servers button, .trow button, .rowfail button");
-  if (target) ripple(target, e);
+  if (!isEl(e.target)) return;
+  const t = e.target.closest(".btn, .chips button, .servers button, .trow button, .rowfail button");
+  if (t) ripple(t, e);
 });
 
 document.addEventListener("click", e => {
+  if (!isEl(e.target)) return;
   const t = e.target.closest(".btn, .iconbtn, .chips button, .tabs button, .servers button, .trow button, .ep");
   if (t) SFX.thock(t.classList.contains("light") ? 1.1 : 0.85);
 });
 
-/* typing ticks */
 document.addEventListener("keydown", e => {
   const tag = document.activeElement?.tagName;
   const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
   if (typing || e.key.length === 1 || e.key === "Backspace" || e.key === "Enter") SFX.key();
 });
 
-/* ══════════════════ EVENTS ══════════════════ */
+/* ═══════════ EVENTS ═══════════ */
 document.addEventListener("click", e => {
+  if (!isEl(e.target)) return;
+
   const kill = e.target.closest("[data-kill]");
   if (kill) { e.stopPropagation(); SFX.thud(); removeCont(kill.dataset.kill); return; }
 
@@ -1182,6 +1237,7 @@ document.addEventListener("click", e => {
   if (retry) {
     const id = retry.dataset.retry;
     const el = document.getElementById(id);
+    if (!el) return;
     const steps = JSON.parse(el.dataset.steps || '[{}]');
     el.innerHTML = Array.from({length:8},()=>'<div class="sk"></div>').join("");
     SFX.tick();
@@ -1193,9 +1249,12 @@ document.addEventListener("click", e => {
   if (fav && !fav.closest("#modal")) {
     e.stopPropagation();
     const el = fav.closest(".card");
-    toggleList({ id:fav.dataset.fav, type:el.dataset.type,
-      name:el.querySelector(".t")?.textContent || el.querySelector(".cap")?.textContent || "",
-      poster:el.querySelector("img")?.getAttribute("src") || "" }, null);
+    toggleList({
+      id: fav.dataset.fav,
+      type: el.dataset.type,
+      name: el.querySelector(".t")?.textContent || el.querySelector(".cap")?.textContent || "",
+      poster: el.querySelector("img")?.getAttribute("src") || "",
+    }, null);
     return;
   }
   const pl = e.target.closest("[data-play]");
@@ -1211,7 +1270,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(
 addEventListener("scroll", () => $("#nav").classList.toggle("solid", scrollY > 40));
 
 $("#navLinks").onclick = e => {
-  const b = e.target.closest("button");
+  const b = isEl(e.target) ? e.target.closest("button") : null;
   if (!b) return;
   $$("#navLinks button").forEach(x => x.classList.toggle("on", x === b));
   const p = b.dataset.page;
@@ -1225,23 +1284,43 @@ $("#searchBtn").onclick = () => { SFX.tick(0.6); renderSearch(); };
 
 /* sound controls */
 const sndBtn = $("#sndBtn");
-const syncSnd = () => {
+const volInput = $("#vol");
+function syncSnd() {
+  if (!sndBtn) return;
   sndBtn.classList.toggle("off", SFX.muted);
   sndBtn.textContent = SFX.muted ? "🔇" : "♪";
   sndBtn.title = SFX.muted ? "Sound off" : "Sound on";
-};
-syncSnd();
-sndBtn.onclick = () => { SFX.toggleMute(); syncSnd(); };
-sndBtn.oncontextmenu = e => { e.preventDefault(); $("#volpop").classList.toggle("on"); };
-$("#vol").value = Math.round(SFX.vol * 100);
-$("#vol").oninput = e => SFX.setVol(+e.target.value / 100);
-$("#vol").onchange = () => SFX.tick(0.6);
+}
+if (sndBtn) {
+  syncSnd();
+  sndBtn.onclick = () => { SFX.toggleMute(); syncSnd(); };
+  sndBtn.oncontextmenu = e => { e.preventDefault(); $("#volpop")?.classList.toggle("on"); };
+}
+if (volInput) {
+  volInput.value = Math.round(SFX.vol * 100);
+  volInput.oninput = e => SFX.setVol(+e.target.value / 100);
+  volInput.onchange = () => SFX.tick(0.6);
+}
 document.addEventListener("click", e => {
-  if (!e.target.closest("#volpop") && !e.target.closest("#sndBtn")) $("#volpop").classList.remove("on");
+  if (!isEl(e.target)) return;
+  if (!e.target.closest("#volpop") && !e.target.closest("#sndBtn")) $("#volpop")?.classList.remove("on");
 });
 
-/* ══════════════════ BOOT ══════════════════ */
-renderHome();
+/* ═══════════ BOOT ═══════════ */
+addEventListener("error", ev => {
+  if (ev.error) console.error("[reeljack]", ev.error);
+});
+addEventListener("unhandledrejection", ev => console.error("[reeljack]", ev.reason));
+
+try {
+  renderHome();
+} catch (err) {
+  console.error("[reeljack] boot failed", err);
+  const main = $("#main");
+  if (main) main.innerHTML = `<div class="empty"><b>Something broke on load</b>
+    ${esc(err.message || err)}
+    <div style="margin-top:14px"><button class="btn sm" onclick="location.reload()">Reload</button></div></div>`;
+}
 })();
 </script>
 </body>
