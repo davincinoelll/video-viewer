@@ -127,14 +127,17 @@ main.view{animation:viewin .45s var(--ease)}
 .card{flex:0 0 auto;width:var(--cw);border-radius:var(--r);position:relative;
   transition:transform .26s var(--ease);transform-origin:center}
 .card:hover{transform:scale(1.07);z-index:20}
-.card .art{aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;background:var(--card);
-  box-shadow:0 6px 18px rgba(0,0,0,.5);position:relative;cursor:pointer;
+.card .art{position:relative;border-radius:var(--r);overflow:hidden;background:var(--card);
+  box-shadow:0 6px 18px rgba(0,0,0,.5);cursor:pointer;
   border:1px solid rgba(255,238,220,.06);transition:box-shadow .3s var(--ease),border-color .3s}
+/* padding-based 2:3 box, no aspect-ratio dependency */
+.card .art::before{content:"";display:block;padding-bottom:150%}
 .card:hover .art{box-shadow:0 16px 40px -14px rgba(0,0,0,.85),0 0 0 1px rgba(243,168,107,.4),
   0 0 34px -8px var(--glow);border-color:rgba(243,168,107,.35)}
-.card .art img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease),filter .3s}
-.card:hover .art img{filter:brightness(1.06)}
-.card .art .ph{width:100%;height:100%;display:grid;place-items:center;text-align:center;padding:6px;
+.card .art > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .5s var(--ease),filter .3s}
+.card:hover .art > img{filter:brightness(1.06)}
+.card .art .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:6px;
   font-size:10.5px;font-weight:600;line-height:1.3;color:var(--dim);
   background:linear-gradient(155deg,#2b221b,#1a1411)}
 .card .badge{position:absolute;top:5px;left:5px;font-size:9px;font-weight:700;letter-spacing:.04em;
@@ -184,8 +187,9 @@ main.view{animation:viewin .45s var(--ease)}
 .card .cap{display:none;font-size:11px;font-weight:600;line-height:1.3;margin-top:5px;color:var(--dim);
   -webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 
-.sk{flex:0 0 auto;width:var(--cw);aspect-ratio:2/3;border-radius:var(--r);
+.sk{flex:0 0 auto;width:var(--cw);border-radius:var(--r);position:relative;overflow:hidden;
   background:linear-gradient(100deg,#1d1713,#2b221b,#1d1713);background-size:220% 100%;animation:sh 1.5s linear infinite}
+.sk::before{content:"";display:block;padding-bottom:150%}
 @keyframes sh{0%{background-position:120% 0}100%{background-position:-120% 0}}
 
 .rowfail{display:flex;align-items:center;gap:10px;padding:6px 4%;color:var(--dim);font-size:13px}
@@ -216,8 +220,9 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px var(--line);
   transform:translateY(24px) scale(.985);transition:.4s var(--ease)}
 #modal.on .sheet{transform:none}
-.hero{position:relative;aspect-ratio:16/9;background:#0a0806}
-.hero img{width:100%;height:100%;object-fit:cover}
+/* padding-based 16:9 boxes — never collapse */
+.hero{position:relative;padding-bottom:56.25%;background:#0a0806;overflow:hidden}
+.hero > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero .fade{position:absolute;inset:0;background:linear-gradient(0deg,var(--bg2) 3%,rgba(23,18,16,.1) 55%)}
 .hero .x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
   background:rgba(16,13,11,.82);border:1px solid var(--line2);display:grid;place-items:center;font-size:14px;z-index:3;
@@ -227,14 +232,15 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 .hero h2{font-size:clamp(23px,3.4vw,35px);font-weight:700;line-height:1.08;margin-bottom:12px}
 .hero .lg{max-width:min(320px,50%);max-height:96px;object-fit:contain;object-position:left bottom;
   margin-bottom:12px;filter:drop-shadow(0 4px 18px rgba(0,0,0,.85))}
+.hero .loadstate{position:absolute;inset:0;display:grid;place-items:center;color:var(--dim2);font-size:13px}
 .mrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:#cdbfae;margin-bottom:14px}
 .mrow .match{color:var(--ok);font-weight:700}
 .tagline{font-size:11px;padding:2px 8px;border:1px solid var(--line2);border-radius:99px;color:var(--dim)}
 .tagline.resume{color:#ffd7a8;border-color:rgba(243,168,107,.4);background:rgba(243,168,107,.1)}
-.player{position:relative;aspect-ratio:16/9;background:#000;border-bottom:1px solid var(--line)}
+.player{position:relative;width:100%;padding-bottom:56.25%;background:#000;border-bottom:1px solid var(--line)}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
-.player .boot{position:absolute;inset:0;display:grid;place-items:center;font-size:12.5px;color:var(--dim2);
-  pointer-events:none}
+.player .boot{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;
+  font-size:12.5px;color:var(--dim2);pointer-events:none;z-index:2}
 .pfoot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 26px;border-bottom:1px solid var(--line);
   font-size:11.5px;color:var(--dim2)}
 .pfoot span{margin-right:auto}
@@ -262,7 +268,7 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   border:1px solid transparent;transition:.2s var(--ease);text-align:left;width:100%;position:relative;overflow:hidden}
 .ep:hover{background:var(--card2);border-color:var(--line2);transform:translateX(2px)}
 .ep.now{border-color:rgba(243,168,107,.5)}
-.ep .th{width:74px;aspect-ratio:16/9;border-radius:6px;object-fit:cover;background:#2a211b;flex:0 0 auto}
+.ep .th{width:74px;border-radius:6px;object-fit:cover;background:#2a211b;flex:0 0 auto}
 .ep .n{font-weight:700;color:var(--dim);font-size:12px}
 .ep .et{font-size:12.5px;line-height:1.4}
 .ep .et small{display:block;color:var(--dim2);font-size:11px;margin-top:2px}
@@ -340,9 +346,7 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 
 const cl = (n,a,b) => Math.min(b, Math.max(a, n));
 
-/* ═══════════ SAFE STORAGE ═══════════
-   localStorage throws in private mode and when storage is blocked,
-   which used to abort the whole script. Falls back to memory. */
+/* ═══════════ SAFE STORAGE ═══════════ */
 const store = (() => {
   let mem = {}, live = true;
   try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); }
@@ -363,8 +367,7 @@ const store = (() => {
   };
 })();
 
-/* ═══════════ SAFE TIMEOUT ═══════════
-   AbortSignal.timeout is missing on Safari <16 / Firefox <100. */
+/* ═══════════ SAFE TIMEOUT ═══════════ */
 function timeoutSignal(ms) {
   try {
     if (AbortSignal && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms);
@@ -375,11 +378,10 @@ function timeoutSignal(ms) {
 }
 
 /* ═══════════ ASMR SOUND ENGINE ═══════════
-   Everything is synthesised: soft close-mic taps, breathy air, damped
-   body knocks. A generated impulse response gives a small, close room,
-   a gentle lowpass takes the glass off the top end, and a compressor
-   keeps transients rounded instead of clicky. Levels are deliberately
-   low — this is meant to sit under the page, not over it.            */
+   Soft close-mic taps, breathy air and damped body knocks, all
+   synthesised. A generated impulse response gives a small close room,
+   a lowpass takes the glass off the top end and a compressor rounds
+   the transients so nothing clicks. Levels stay low on purpose.    */
 const SFX = (() => {
   const AC = window.AudioContext || window.webkitAudioContext;
   const noop = () => {};
@@ -394,7 +396,6 @@ const SFX = (() => {
   let vol = Number.isFinite(storedVol) ? cl(storedVol, 0, 1) : 0.6;
   let muted = store.get("rj_mute", false) === true;
 
-  /* soft decaying noise = plausible small room */
   function makeIR(seconds, decay) {
     const len = Math.max(1, Math.floor(ctx.sampleRate * seconds));
     const buf = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -443,7 +444,6 @@ const SFX = (() => {
     const d = buf.getChannelData(0);
     let last = 0;
     for (let i = 0; i < len; i++) {
-      /* one-pole smoothing softens the noise into "air" rather than hiss */
       last = (last + (Math.random() * 2 - 1)) * 0.5;
       d[i] = last * (1 - i / len);
     }
@@ -452,7 +452,6 @@ const SFX = (() => {
     return s;
   }
 
-  /* soft noise puff */
   function air(o = {}) {
     const { dur = 0.06, freq = 1500, q = 1.1, gain = 0.05,
             attack = 0.004, decay = null, sweep = null, type = "bandpass" } = o;
@@ -474,7 +473,6 @@ const SFX = (() => {
     } catch {}
   }
 
-  /* soft tone with optional downward glide */
   function tone(freq, dur, o = {}) {
     const { type = "sine", to = null, gain = 0.05, attack = 0.005 } = o;
     if (!ready()) return;
@@ -494,9 +492,6 @@ const SFX = (() => {
     } catch {}
   }
 
-  /* ── voices ───────────────────────────────────────────── */
-
-  /* fingertip on a soft surface — the default for any click */
   function tap(gain = 1) {
     const t = performance.now();
     if (t - lastAny < 24) return;
@@ -505,7 +500,6 @@ const SFX = (() => {
     tone(jitter(560, 0.08), 0.07, { to: 300, gain: 0.026 * gain });
   }
 
-  /* the fuller press for real controls */
   function press() {
     const t = performance.now();
     if (t - lastAny < 24) return;
@@ -515,7 +509,6 @@ const SFX = (() => {
     tone(jitter(660, 0.1), 0.06, { type: "triangle", gain: 0.014 });
   }
 
-  /* breath across a mic — card hover */
   function hover() {
     const t = performance.now();
     if (t - lastHover < 90) return;
@@ -523,14 +516,12 @@ const SFX = (() => {
     air({ dur: 0.3, freq: jitter(600, 0.2), q: 0.7, gain: 0.022, attack: 0.07, decay: 0.2 });
   }
 
-  /* silk / curtain */
   function whoosh(up = true) {
     if (!ready()) return;
     air({ dur: 0.44, freq: up ? 300 : 1500, sweep: up ? 1650 : 240,
-          q: 0.7, gain: 0.06, attack: 0.09, decay: 0.3, type: "bandpass" });
+          q: 0.7, gain: 0.06, attack: 0.09, decay: 0.3 });
   }
 
-  /* glass bell, long room tail */
   function chime(up = true) {
     if (!ready()) return;
     [up ? 784 : 587, up ? 1175 : 440].forEach((f, i) => {
@@ -538,14 +529,12 @@ const SFX = (() => {
     });
   }
 
-  /* soft body knock */
   function thud() {
     if (!ready()) return;
     tone(124, 0.24, { to: 58, gain: 0.075 });
     air({ dur: 0.09, freq: 400, q: 0.8, gain: 0.045, decay: 0.1, type: "lowpass" });
   }
 
-  /* page turn — typing */
   function key() {
     air({ dur: 0.055, freq: jitter(2700, 0.15), q: 0.8, gain: 0.017, attack: 0.006, decay: 0.05 });
   }
@@ -588,23 +577,25 @@ const TRACKERS = ["udp://tracker.opentrackr.org:1337/announce","udp://open.demon
   "udp://tracker.openbittorrent.com:6969/announce","udp://exodus.desync.com:6969/announce"];
 
 /* ── PLAYBACK SERVERS ───────────────────────────────────────────────
-   Domains move around, so each entry is isolated and swappable.
-   `kind` decides which id gets substituted:
-     "imdb" -> tt-id      "tmdb" -> numeric TMDB id
-   Every entry MUST expose m(id) for films and t(id, season, episode)
-   for series, and must return an https URL that allows framing.      */
+   Every player below is framed with referrerpolicy="origin" because
+   most of them issue a short-lived, host-bound gate token and reject
+   a request that arrives with no Referer at all.                    */
 const SERVERS = [
   { name:"VidSrc",     kind:"imdb",
     m:id=>`https://vidsrc.sh/embed/movie/${id}?autoplay=1`,
     t:(id,s,e)=>`https://vidsrc.sh/embed/tv/${id}/${s}/${e}?autoplay=1` },
 
-  { name:"VidSrc Alt", kind:"imdb",
-    m:id=>`https://vidsrc.ir/embed/movie/${id}?autoplay=1`,
-    t:(id,s,e)=>`https://vidsrc.ir/embed/tv/${id}/${s}/${e}?autoplay=1` },
+  { name:"2Embed",     kind:"imdb",
+    m:id=>`https://www.2embed.cc/embed/movie/${id}`,
+    t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
 
   { name:"VidLink",    kind:"tmdb",
     m:id=>`https://vidlink.pro/movie/${id}?autoplay=true`,
     t:(id,s,e)=>`https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true` },
+
+  { name:"VidSrc Alt", kind:"imdb",
+    m:id=>`https://vidsrc.ir/embed/movie/${id}?autoplay=1`,
+    t:(id,s,e)=>`https://vidsrc.ir/embed/tv/${id}/${s}/${e}?autoplay=1` },
 
   { name:"Videasy",    kind:"tmdb",
     m:id=>`https://player.videasy.net/movie/${id}`,
@@ -613,10 +604,6 @@ const SERVERS = [
   { name:"EmbedWave",  kind:"tmdb",
     m:id=>`https://embedwave.cc/embed/movie/${id}?autoplay=1`,
     t:(id,s,e)=>`https://embedwave.cc/embed/tv/${id}/${s}/${e}?autoplay=1` },
-
-  { name:"2Embed",     kind:"imdb",
-    m:id=>`https://www.2embed.cc/embed/movie/${id}`,
-    t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
 
   { name:"SuperEmbed", kind:"imdb",
     m:id=>`https://multiembed.mov/?video_id=${id}`,
@@ -797,9 +784,8 @@ document.addEventListener("error", e => {
 }, true);
 
 /* ═══════════ HOVER PREVIEW ═══════════
-   Two layers: a still frame that paints immediately and always succeeds,
-   and a muted trailer that fades in on top only once it has actually
-   loaded. Nothing waits on the network before showing something.      */
+   A still frame paints immediately and always succeeds; the muted
+   trailer fades in over it only once it has actually loaded.       */
 let prevTimer, prevBox, prevId;
 
 function hidePreview() {
@@ -829,9 +815,7 @@ async function runPreview(cardEl, id, type) {
   const coarse = window.matchMedia && window.matchMedia("(pointer:coarse)").matches;
   const still = seed.background || seed.poster || "";
 
-  /* paint the still straight away from whatever we already hold */
-  if (still) previewStill(box, still);
-  if (still) box.classList.add("on");
+  if (still) { previewStill(box, still); box.classList.add("on"); }
 
   let m = seed;
   try { m = { ...seed, ...(await metaOf(type, id)) }; } catch {}
@@ -844,8 +828,7 @@ async function runPreview(cardEl, id, type) {
     box.classList.add("on");
   }
   if (!box.classList.contains("on")) return;
-
-  if (coarse) return;  /* touch: still frame is the preview */
+  if (coarse) return;
 
   const tr = [...(m.trailers || []), ...(m.trailerStreams || [])].find(x => x && x.source);
   if (!tr) return;
@@ -857,7 +840,7 @@ async function runPreview(cardEl, id, type) {
   frame.title = "";
   frame.allow = "autoplay; encrypted-media";
   frame.setAttribute("allowfullscreen", "");
-  frame.referrerPolicy = "no-referrer";
+  frame.referrerPolicy = "origin";
   frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(tr.source)}` +
     `?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3` +
     `&loop=1&playlist=${encodeURIComponent(tr.source)}${origin}`;
@@ -1112,20 +1095,21 @@ function renderSearch() {
 }
 
 /* ═══════════ DETAIL ═══════════ */
-let modalId, modalType, season = 1, server = 0, curMeta = null, lastStreamUrl = "";
+let modalId, modalType, season = 1, server = 0, curMeta = null, lastStreamUrl = "", autoTries = 0;
 
 async function openDetail(id, type) {
   hidePreview();
   modalId = id;
   modalType = type;
   server = 0;
+  autoTries = 0;
   lastStreamUrl = "";
   SFX.whoosh(true);
   $("#modal").classList.add("on");
   $("#scrim").classList.add("on");
   $("#modal").setAttribute("aria-hidden", "false");
-  $("#modal").innerHTML = `<div class="sheet"><div class="hero" style="display:grid;place-items:center">
-    <span style="color:var(--dim2)">loading…</span></div></div>`;
+  $("#modal").innerHTML = `<div class="sheet"><div class="hero">
+    <span class="loadstate">loading…</span></div></div>`;
 
   const seed = itemCache.get(id) || {};
   let m;
@@ -1146,7 +1130,6 @@ async function openDetail(id, type) {
     const resumeEp = cont?.episode ?? 1;
     const bg = m.background || seed.background || "";
 
-    /* remember the server this person actually got working */
     const usableNow = serversFor(m);
     const remembered = store.get("rj_server", "");
     const ri = usableNow.findIndex(x => x.name === remembered);
@@ -1212,7 +1195,7 @@ async function openDetail(id, type) {
       $("#resumeLabel")?.remove();
     });
     $("#trBtn")?.addEventListener("click", () => {
-      $("#playerBox").innerHTML = `<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe></div>`;
+      $("#playerBox").innerHTML = `<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="origin"></iframe></div>`;
     });
 
     $("#tabs").onclick = e => {
@@ -1258,14 +1241,11 @@ function drawSeason(n) {
   };
 }
 
-/* servers that can actually be used for this title:
-   TMDB-based ones need a TMDB id, so they are dropped when it's absent */
 function serversFor(meta) {
   const tmdb = meta?.moviedb_id;
   return SERVERS.filter(s => s.kind === "imdb" || tmdb);
 }
 
-/* build the iframe src for the given server/target */
 function streamUrl(srv, s, e) {
   const id = srv.kind === "tmdb" ? curMeta?.moviedb_id : modalId;
   if (!id) return "";
@@ -1274,16 +1254,17 @@ function streamUrl(srv, s, e) {
     : srv.m(id);
 }
 
-function play(s, e) {
+function play(s, e, auto = false) {
   if (!curMeta) return;
   const box = $("#playerBox");
   if (!box) return;
+
+  if (!auto) autoTries = 0;
 
   const usable = serversFor(curMeta);
   if (!usable.length) { toast("No playable source", "err"); return; }
   if (server >= usable.length || server < 0) server = 0;
 
-  /* skip servers we can't address, so a missing TMDB id can't blank the player */
   let srv = null, url = "";
   for (let i = 0; i < usable.length; i++) {
     const cand = usable[(server + i) % usable.length];
@@ -1293,7 +1274,7 @@ function play(s, e) {
   if (!srv || !url) { toast("No playable source", "err"); return; }
 
   lastStreamUrl = url;
-  store.set("rj_server", srv.name);
+  if (!auto) store.set("rj_server", srv.name);
 
   box.innerHTML = `<div class="servers" id="srvRow"><span>Server</span>${
     usable.map((x,i)=>`<button class="${i===server?"on":""}" data-s="${i}">${esc(x.name)}</button>`).join("")}</div>
@@ -1303,8 +1284,8 @@ function play(s, e) {
         title="player"
         allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; gyroscope"
         allowfullscreen webkitallowfullscreen mozallowfullscreen
-        referrerpolicy="no-referrer"
-        scrolling="no" frameborder="0"></iframe>
+        referrerpolicy="origin"
+        frameborder="0"></iframe>
       <div class="boot" id="bootNote">Connecting to ${esc(srv.name)}…</div>
     </div>
     <div class="pfoot">
@@ -1315,14 +1296,25 @@ function play(s, e) {
 
   const frame = $("#streamFrame");
   const note = $("#bootNote");
+  let settled = false;
 
-  const clearNote = () => note?.remove();
-  frame.addEventListener("load", clearNote, { once:true });
-  /* if the frame never reports a load, surface the fallback text */
-  setTimeout(() => {
-    if (!document.body.contains(frame) || !note) return;
-    note.textContent = `${srv.name} is taking a while — try Next server.`;
-  }, 9000);
+  const watchdog = setTimeout(() => {
+    if (settled || !document.body.contains(frame)) return;
+    if (autoTries < usable.length - 1) {
+      autoTries++;
+      if (note) note.textContent = `${srv.name} isn't responding — trying another server…`;
+      server = (server + 1) % usable.length;
+      play(s, e, true);
+    } else if (note) {
+      note.textContent = "Nothing loaded here. Use Open in new tab.";
+    }
+  }, 11000);
+
+  frame.addEventListener("load", () => {
+    settled = true;
+    clearTimeout(watchdog);
+    note?.remove();
+  }, { once:true });
 
   $("#srvRow").onclick = ev => {
     const b = isEl(ev.target) ? ev.target.closest("button") : null;
@@ -1348,6 +1340,19 @@ function play(s, e) {
   currentId = curMeta.id;
   $$(".ep").forEach(el => el.classList.toggle("now", +el.dataset.e === e));
 }
+
+/* players that report a dead title can trigger an immediate server hop */
+addEventListener("message", ev => {
+  const d = ev.data;
+  if (!d || typeof d !== "object" || d.type !== "MEDIA_NOT_FOUND") return;
+  const box = $("#playerBox");
+  if (!box || !box.querySelector("#streamFrame")) return;
+  const usable = serversFor(curMeta);
+  if (!usable.length || autoTries >= usable.length - 1) return;
+  autoTries++;
+  server = (server + 1) % usable.length;
+  play(season, 1, true);
+});
 
 async function loadTorrents(title, imdb) {
   const host = $("#dl");
@@ -1406,6 +1411,7 @@ function closeDetail() {
   curMeta = null;
   currentId = null;
   lastStreamUrl = "";
+  autoTries = 0;
   renderContinue();
 }
 
@@ -1423,15 +1429,15 @@ function ripple(el, ev) {
   setTimeout(() => span.remove(), 600);
 }
 
-/* ── a response for every single pointer-down, wherever it lands ──
-   controls get the fuller press, everything else the plain tap */
+/* a response for every single pointer-down, wherever it lands */
 const CONTROL = ".btn, .iconbtn, .chips button, .tabs button, .servers button, .pfoot button, " +
   ".trow button, .rowfail button, .ep, .card, .fav, .kill, .x, .links button, input, select, #sndBtn";
+const RIPPLE_AT = ".btn, .chips button, .servers button, .pfoot button, .trow button, .rowfail button";
 
 document.addEventListener("pointerdown", e => {
   if (!isEl(e.target)) return;
   const t = e.target.closest(CONTROL);
-  if (t) ripple(t.closest(".btn, .chips button, .servers button, .pfoot button, .trow button, .rowfail button"), e);
+  if (t) ripple(t.closest(RIPPLE_AT), e);
   t ? SFX.press() : SFX.tap();
 }, true);
 
