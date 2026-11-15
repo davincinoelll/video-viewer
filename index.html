@@ -71,22 +71,17 @@ nav.solid{background:rgba(16,13,11,.94);backdrop-filter:blur(14px) saturate(130%
 #volpop{position:fixed;top:60px;right:4%;z-index:120;background:rgba(36,28,23,.97);
   border:1px solid var(--line2);border-radius:14px;padding:12px 14px;display:none;
   box-shadow:0 20px 50px rgba(0,0,0,.6);backdrop-filter:blur(12px)}
-#volpop.on{display:block;animation:pop .22s var(--ease)}
+#volpop.on{display:block}
 #volpop label{font-size:11px;color:var(--dim);display:block;margin-bottom:7px;letter-spacing:.05em}
 #volpop input{width:150px;accent-color:var(--amber)}
 
 #bill{position:relative;height:min(84vh,720px);display:flex;align-items:flex-end;padding:0 4% 9vh;
   overflow:hidden;background:#0a0806}
-#bill .bd{position:absolute;inset:0;background-size:cover;background-position:50% 20%;animation:fade 1s var(--ease)}
+#bill .bd{position:absolute;inset:0;background-size:cover;background-position:50% 20%}
 #bill .bd::after{content:"";position:absolute;inset:0;
   background:linear-gradient(90deg,rgba(16,13,11,.96) 0%,rgba(16,13,11,.7) 44%,rgba(16,13,11,.1) 74%),
              linear-gradient(0deg,var(--bg) 2%,transparent 48%)}
-#bill iframe{position:absolute;inset:0;width:100%;height:100%;border:0;transform:scale(1.35);
-  opacity:0;transition:opacity 1.2s var(--ease)}
-#bill iframe.on{opacity:1}
-#bill .inner{position:relative;max-width:640px;z-index:2;animation:rise .8s var(--ease)}
-#bill .logo{max-width:min(420px,60vw);max-height:150px;object-fit:contain;object-position:left bottom;
-  margin-bottom:16px;filter:drop-shadow(0 8px 30px rgba(0,0,0,.9))}
+#bill .inner{position:relative;max-width:640px;z-index:2}
 #bill h1{font-size:clamp(31px,5.4vw,58px);line-height:1.04;font-weight:700;margin-bottom:14px;
   text-shadow:0 6px 34px rgba(0,0,0,.8)}
 #bill .m{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:#d9cbbc;margin-bottom:14px}
@@ -103,18 +98,13 @@ nav.solid{background:rgba(16,13,11,.94);backdrop-filter:blur(14px) saturate(130%
 .btn.light:hover{background:#fff}
 .btn.red{background:linear-gradient(145deg,var(--amber),var(--amber2));color:#2a1a10;border-color:transparent;
   box-shadow:0 8px 26px -12px var(--amber)}
-.btn.red:hover{box-shadow:0 10px 30px -10px var(--amber)}
 .btn.sm{padding:8px 15px;font-size:12.5px}
 .ripple{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);
   background:radial-gradient(circle,rgba(255,238,220,.55),transparent 70%);
   animation:rip .55s var(--ease) forwards}
 @keyframes rip{to{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
-@keyframes fade{from{opacity:0}}
-@keyframes rise{from{opacity:0;transform:translateY(24px)}}
 
 main{padding:0 0 40px;position:relative;z-index:2;margin-top:-5vh}
-main.view{animation:viewin .45s var(--ease)}
-@keyframes viewin{from{opacity:0;transform:translateY(10px)}}
 .row{margin-bottom:30px}
 .rowhead{display:flex;align-items:baseline;gap:12px;padding:0 4% 8px}
 .rowhead h2{font-size:clamp(16px,1.6vw,19px);font-weight:700;color:#f0e4d6}
@@ -130,7 +120,7 @@ main.view{animation:viewin .45s var(--ease)}
 .card .art{position:relative;border-radius:var(--r);overflow:hidden;background:var(--card);
   box-shadow:0 6px 18px rgba(0,0,0,.5);cursor:pointer;
   border:1px solid rgba(255,238,220,.06);transition:box-shadow .3s var(--ease),border-color .3s}
-/* padding-based 2:3 box, no aspect-ratio dependency */
+/* padding-driven 2:3 box — no aspect-ratio dependency, cannot collapse */
 .card .art::before{content:"";display:block;padding-bottom:150%}
 .card:hover .art{box-shadow:0 16px 40px -14px rgba(0,0,0,.85),0 0 0 1px rgba(243,168,107,.4),
   0 0 34px -8px var(--glow);border-color:rgba(243,168,107,.35)}
@@ -154,8 +144,7 @@ main.view{animation:viewin .45s var(--ease)}
 .card:hover .kill{opacity:1}
 .card .kill:hover{background:var(--bad);border-color:var(--bad);color:#241a12}
 
-/* ── hover preview ────────────────────────────────────────
-   still frame paints instantly, the video layer fades over it */
+/* hover preview: instant still, trailer fades over it */
 .card .prev{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;opacity:0;
   pointer-events:none;transition:opacity .38s var(--ease);background:#0a0806;z-index:2}
 .card .prev.on{opacity:1}
@@ -182,8 +171,6 @@ main.view{animation:viewin .45s var(--ease)}
 .card .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,238,220,.22);
   overflow:hidden;z-index:7;border-radius:0 0 var(--r) var(--r)}
 .card .bar i{display:block;height:100%;background:var(--amber);transition:width .6s linear}
-.card.watched .bar i{background:var(--ok)}
-.cont-label{font-size:10px;color:var(--dim);margin-top:3px}
 .card .cap{display:none;font-size:11px;font-weight:600;line-height:1.3;margin-top:5px;color:var(--dim);
   -webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 
@@ -194,20 +181,23 @@ main.view{animation:viewin .45s var(--ease)}
 
 .rowfail{display:flex;align-items:center;gap:10px;padding:6px 4%;color:var(--dim);font-size:13px}
 .rowfail button{padding:5px 13px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--txt)}
-.rowfail button:hover{background:var(--amber);color:#241a12;border-color:var(--amber)}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:14px 9px;padding:16px 4% 40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:14px 9px;padding:16px 4% 20px}
 .grid .card{width:auto}
 .grid .card:hover{transform:scale(1.05)}
 h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
-.chips{display:flex;gap:7px;overflow-x:auto;padding:14px 4%;scrollbar-width:none}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:10px 4% 0;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chips button{padding:7px 15px;border-radius:99px;border:1px solid var(--line2);font-size:12.5px;
   color:var(--dim);white-space:nowrap;transition:.2s var(--ease)}
 .chips button:hover{color:var(--txt);border-color:var(--amber);background:rgba(243,168,107,.1)}
 .chips button.on{background:var(--amber);color:#241a12;border-color:var(--amber);font-weight:700}
-.empty{text-align:center;padding:120px 20px;color:var(--dim);font-size:14px}
+.chips .lab{font-size:10.5px;color:var(--dim2);text-transform:uppercase;letter-spacing:.1em;
+  align-self:center;padding-right:4px;white-space:nowrap}
+.empty{text-align:center;padding:100px 20px;color:var(--dim);font-size:14px}
 .empty b{display:block;color:var(--txt);font-family:Georgia,serif;font-size:20px;margin-bottom:8px}
+.morewrap{display:flex;justify-content:center;padding:8px 4% 50px}
+.count{font-size:12px;color:var(--dim2);padding:0 4%}
 .greet{padding:104px 4% 0;font-size:13px;color:var(--dim2);letter-spacing:.05em;text-transform:uppercase}
 
 #scrim{position:fixed;inset:0;background:rgba(8,6,5,.8);backdrop-filter:blur(5px);z-index:200;
@@ -220,37 +210,35 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px var(--line);
   transform:translateY(24px) scale(.985);transition:.4s var(--ease)}
 #modal.on .sheet{transform:none}
-/* padding-based 16:9 boxes — never collapse */
-.hero{position:relative;padding-bottom:56.25%;background:#0a0806;overflow:hidden}
-.hero > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero .fade{position:absolute;inset:0;background:linear-gradient(0deg,var(--bg2) 3%,rgba(23,18,16,.1) 55%)}
+/* hero: 16:9 frame + body in normal flow, so long titles never clip */
+.hero{position:relative;background:#0a0806}
+.hero .frame{position:relative;padding-bottom:56.25%;overflow:hidden}
+.hero .frame > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .frame::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(0deg,var(--bg2) 2%,rgba(23,18,16,.15) 60%)}
 .hero .x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
-  background:rgba(16,13,11,.82);border:1px solid var(--line2);display:grid;place-items:center;font-size:14px;z-index:3;
-  transition:.2s}
+  background:rgba(16,13,11,.82);border:1px solid var(--line2);display:grid;place-items:center;font-size:14px;z-index:4}
 .hero .x:hover{background:var(--amber);color:#241a12;transform:rotate(90deg)}
-.hero .body{position:absolute;left:0;right:0;bottom:0;padding:24px 26px 18px}
+.hero .body{position:relative;margin-top:-88px;padding:0 26px 18px;z-index:3}
 .hero h2{font-size:clamp(23px,3.4vw,35px);font-weight:700;line-height:1.08;margin-bottom:12px}
 .hero .lg{max-width:min(320px,50%);max-height:96px;object-fit:contain;object-position:left bottom;
   margin-bottom:12px;filter:drop-shadow(0 4px 18px rgba(0,0,0,.85))}
-.hero .loadstate{position:absolute;inset:0;display:grid;place-items:center;color:var(--dim2);font-size:13px}
+.loadstate{display:grid;place-items:center;padding:60px 0;color:var(--dim2);font-size:13px}
 .mrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:#cdbfae;margin-bottom:14px}
 .mrow .match{color:var(--ok);font-weight:700}
 .tagline{font-size:11px;padding:2px 8px;border:1px solid var(--line2);border-radius:99px;color:var(--dim)}
-.tagline.resume{color:#ffd7a8;border-color:rgba(243,168,107,.4);background:rgba(243,168,107,.1)}
-.player{position:relative;width:100%;padding-bottom:56.25%;background:#000;border-bottom:1px solid var(--line)}
+.player{position:relative;width:100%;padding-bottom:56.25%;background:#000}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .player .boot{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;
   font-size:12.5px;color:var(--dim2);pointer-events:none;z-index:2}
-.pfoot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 26px;border-bottom:1px solid var(--line);
-  font-size:11.5px;color:var(--dim2)}
+.pfoot,.servers{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 26px;
+  border-top:1px solid var(--line);font-size:11.5px;color:var(--dim2)}
 .pfoot span{margin-right:auto}
-.pfoot button{padding:5px 12px;border-radius:99px;border:1px solid var(--line2);font-size:11.5px;color:var(--dim);transition:.18s}
-.pfoot button:hover{color:var(--txt);border-color:var(--amber);background:rgba(243,168,107,.1)}
-.servers{display:flex;gap:7px;flex-wrap:wrap;padding:11px 26px;border-bottom:1px solid var(--line);align-items:center}
-.servers span{font-size:10.5px;color:var(--dim2);margin-right:4px;text-transform:uppercase;letter-spacing:.1em}
-.servers button{padding:5px 12px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--dim);transition:.18s}
-.servers button:hover{color:var(--txt);border-color:var(--amber)}
+.pfoot button,.servers button{padding:5px 12px;border-radius:99px;border:1px solid var(--line2);
+  font-size:11.5px;color:var(--dim);transition:.18s}
+.pfoot button:hover,.servers button:hover{color:var(--txt);border-color:var(--amber)}
 .servers button.on{background:var(--amber);color:#241a12;border-color:var(--amber);font-weight:700}
+.servers .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em}
 .sheet .pad{padding:18px 26px 30px}
 .ov{font-size:14.5px;color:#d8cab9;margin-bottom:16px;line-height:1.7}
 .kv{font-size:12.5px;color:var(--dim);margin-bottom:8px}
@@ -258,7 +246,6 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 .tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin:0 26px;font-size:13px;font-weight:600;overflow-x:auto}
 .tabs button{padding:12px 0;color:var(--dim2);border-bottom:2px solid transparent;margin-bottom:-1px;
   white-space:nowrap;transition:.2s}
-.tabs button:hover{color:var(--txt)}
 .tabs button.on{color:var(--amber);border-color:var(--amber)}
 .seasons{padding:16px 26px 4px}
 .seasons select{background:var(--card);border:1px solid var(--line2);color:var(--txt);padding:7px 11px;
@@ -268,25 +255,23 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   border:1px solid transparent;transition:.2s var(--ease);text-align:left;width:100%;position:relative;overflow:hidden}
 .ep:hover{background:var(--card2);border-color:var(--line2);transform:translateX(2px)}
 .ep.now{border-color:rgba(243,168,107,.5)}
-.ep .th{width:74px;border-radius:6px;object-fit:cover;background:#2a211b;flex:0 0 auto}
+.ep .th{width:74px;height:42px;border-radius:6px;object-fit:cover;background:#2a211b;flex:0 0 auto}
 .ep .n{font-weight:700;color:var(--dim);font-size:12px}
 .ep .et{font-size:12.5px;line-height:1.4}
 .ep .et small{display:block;color:var(--dim2);font-size:11px;margin-top:2px}
-.ep .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,238,220,.12)}
-.ep .bar i{display:block;height:100%;background:var(--amber)}
+.cast{display:flex;gap:12px;overflow-x:auto;padding:4px 0 16px}
+.cast div{flex:0 0 auto;width:76px;text-align:center}
+.cast .av{width:76px;height:76px;border-radius:50%;background:var(--card2);display:grid;place-items:center;
+  font-family:Georgia,serif;font-size:24px;color:var(--dim2);border:1px solid var(--line)}
+.cast p{font-size:11px;margin-top:6px;line-height:1.35;color:var(--dim)}
 .trow{display:flex;gap:10px;align-items:center;padding:9px 11px;background:var(--card);border-radius:9px;
   margin-bottom:7px;border:1px solid transparent;transition:.18s}
 .trow:hover{border-color:var(--line2);background:var(--card2)}
 .trow .q{font-weight:700;font-size:12px;min-width:48px;color:var(--amber)}
 .trow .sz{font-size:12px;color:var(--dim);flex:1}
 .trow .sd{font-size:12px;color:var(--ok);font-weight:700;min-width:52px;text-align:right}
-.trow button{background:rgba(255,238,220,.12);padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:600;transition:.18s}
+.trow button{background:rgba(255,238,220,.12);padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:600}
 .trow button:hover{background:var(--amber);color:#241a12}
-.cast{display:flex;gap:12px;overflow-x:auto;padding:4px 0 16px}
-.cast div{flex:0 0 auto;width:76px;text-align:center}
-.cast .av{width:76px;height:76px;border-radius:50%;background:var(--card2);display:grid;place-items:center;
-  font-family:Georgia,serif;font-size:24px;color:var(--dim2);border:1px solid var(--line)}
-.cast p{font-size:11px;margin-top:6px;line-height:1.35;color:var(--dim)}
 
 #toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:400;display:flex;
   flex-direction:column;gap:8px;align-items:center}
@@ -300,7 +285,7 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
   :root{--cw:clamp(96px,27vw,124px)}
   .links{gap:14px;font-size:13px}
   #bill{height:72vh;padding-bottom:12vh}
-  .hero .body{padding:16px}
+  .hero .body{padding:0 16px 16px;margin-top:-64px}
   .sheet .pad,.tabs,.servers,.eps,.seasons,.pfoot{padding-left:16px;padding-right:16px}
   .tabs{margin:0 16px}
   .card:hover{transform:none}
@@ -343,224 +328,151 @@ h3.page-h{font-size:clamp(22px,3.2vw,32px);font-weight:700;padding:108px 4% 0}
 <script>
 (() => {
 "use strict";
-
 const cl = (n,a,b) => Math.min(b, Math.max(a, n));
 
-/* ═══════════ SAFE STORAGE ═══════════ */
+/* ── safe storage ────────────────────────────────────────── */
 const store = (() => {
   let mem = {}, live = true;
-  try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); }
+  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); }
   catch { live = false; }
   return {
-    get(k, d) {
-      try {
-        const raw = live ? localStorage.getItem(k) : mem[k];
-        return raw == null ? d : JSON.parse(raw);
-      } catch { return d; }
+    get(k,d) {
+      try { const r = live ? localStorage.getItem(k) : mem[k]; return r == null ? d : JSON.parse(r); }
+      catch { return d; }
     },
-    set(k, v) {
-      const raw = JSON.stringify(v);
-      mem[k] = raw;
-      try { if (live) localStorage.setItem(k, raw); }
-      catch { live = false; }
-    },
+    set(k,v) {
+      const r = JSON.stringify(v); mem[k] = r;
+      try { if (live) localStorage.setItem(k, r); } catch { live = false; }
+    }
   };
 })();
 
-/* ═══════════ SAFE TIMEOUT ═══════════ */
 function timeoutSignal(ms) {
-  try {
-    if (AbortSignal && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms);
-  } catch {}
+  try { if (AbortSignal && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms); } catch {}
   const c = new AbortController();
   setTimeout(() => { try { c.abort(); } catch {} }, ms);
   return c.signal;
 }
 
-/* ═══════════ ASMR SOUND ENGINE ═══════════
-   Soft close-mic taps, breathy air and damped body knocks, all
-   synthesised. A generated impulse response gives a small close room,
-   a lowpass takes the glass off the top end and a compressor rounds
-   the transients so nothing clicks. Levels stay low on purpose.    */
+/* ── ASMR sound ──────────────────────────────────────────── */
 const SFX = (() => {
   const AC = window.AudioContext || window.webkitAudioContext;
   const noop = () => {};
   if (!AC) return { tap:noop, press:noop, hover:noop, whoosh:noop, chime:noop,
-    thud:noop, key:noop, tick:noop, thock:noop, setVol:noop, toggleMute:() => false,
-    boot:noop, muted:false, vol:0.6 };
+    thud:noop, key:noop, boot:noop, setVol:noop, toggleMute:() => false, muted:false };
 
   let ctx = null, master = null, bus = null, dry = null, wet = null, conv = null;
   let lastHover = 0, lastAny = 0;
-
   const storedVol = store.get("rj_vol", 0.6);
-  let vol = Number.isFinite(storedVol) ? cl(storedVol, 0, 1) : 0.6;
+  let vol = Number.isFinite(storedVol) ? cl(storedVol,0,1) : 0.6;
   let muted = store.get("rj_mute", false) === true;
 
-  function makeIR(seconds, decay) {
-    const len = Math.max(1, Math.floor(ctx.sampleRate * seconds));
-    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (let ch = 0; ch < 2; ch++) {
-      const d = buf.getChannelData(ch);
-      for (let i = 0; i < len; i++) {
-        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-      }
+  function ir(sec, decay) {
+    const n = Math.max(1, Math.floor(ctx.sampleRate * sec));
+    const b = ctx.createBuffer(2, n, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const a = b.getChannelData(c);
+      for (let i = 0; i < n; i++) a[i] = (Math.random()*2-1) * Math.pow(1 - i/n, decay);
     }
-    return buf;
+    return b;
   }
-
   function boot() {
     try {
       if (!ctx) {
         ctx = new AC();
-        bus   = ctx.createGain();
-        dry   = ctx.createGain();  dry.gain.value = 0.9;
-        wet   = ctx.createGain();  wet.gain.value = 0.18;
-        conv  = ctx.createConvolver(); conv.buffer = makeIR(1.4, 3.6);
-        master = ctx.createGain(); master.gain.value = muted ? 0 : vol * 0.55;
-
-        const tone = ctx.createBiquadFilter();
-        tone.type = "lowpass"; tone.frequency.value = 5400; tone.Q.value = 0.3;
-
+        bus = ctx.createGain();
+        dry = ctx.createGain(); dry.gain.value = .9;
+        wet = ctx.createGain(); wet.gain.value = .18;
+        conv = ctx.createConvolver(); conv.buffer = ir(1.4, 3.6);
+        master = ctx.createGain(); master.gain.value = muted ? 0 : vol * .55;
+        const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 5400;
         const comp = ctx.createDynamicsCompressor();
         comp.threshold.value = -30; comp.knee.value = 26; comp.ratio.value = 3.2;
-        comp.attack.value = 0.008; comp.release.value = 0.3;
-
         bus.connect(dry).connect(master);
         bus.connect(conv).connect(wet).connect(master);
-        master.connect(tone).connect(comp).connect(ctx.destination);
+        master.connect(lp).connect(comp).connect(ctx.destination);
       }
       if (ctx.state === "suspended") ctx.resume().catch(() => {});
       return ctx;
     } catch { return null; }
   }
   const ready = () => !!boot() && !muted;
-  const now = () => ctx.currentTime;
-  const jitter = (n, amt) => n * (1 + (Math.random() * 2 - 1) * amt);
-  const pan = () => (Math.random() * 2 - 1) * 0.38;
+  const jit = (n,a) => n * (1 + (Math.random()*2-1) * a);
+  const pan = () => (Math.random()*2-1) * .38;
 
-  function noiseSrc(dur) {
-    const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
-    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    const d = buf.getChannelData(0);
+  function src(dur) {
+    const n = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const b = ctx.createBuffer(1, n, ctx.sampleRate);
+    const a = b.getChannelData(0);
     let last = 0;
-    for (let i = 0; i < len; i++) {
-      last = (last + (Math.random() * 2 - 1)) * 0.5;
-      d[i] = last * (1 - i / len);
-    }
-    const s = ctx.createBufferSource();
-    s.buffer = buf;
-    return s;
+    for (let i = 0; i < n; i++) { last = (last + (Math.random()*2-1)) * .5; a[i] = last * (1 - i/n); }
+    const s = ctx.createBufferSource(); s.buffer = b; return s;
   }
-
   function air(o = {}) {
-    const { dur = 0.06, freq = 1500, q = 1.1, gain = 0.05,
-            attack = 0.004, decay = null, sweep = null, type = "bandpass" } = o;
+    const { dur = .06, freq = 1500, q = 1.1, gain = .05, attack = .004, type = "bandpass" } = o;
     if (!ready()) return;
     try {
-      const t = now();
-      const n = noiseSrc(dur);
-      const f = ctx.createBiquadFilter();
-      f.type = type; f.frequency.value = freq; f.Q.value = q;
-      if (sweep) f.frequency.exponentialRampToValueAtTime(sweep, t + dur);
-      const g = ctx.createGain();
-      const d = decay ?? Math.max(0.02, dur * 0.8);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(Math.max(gain, 0.0002), t + attack);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + attack + d);
+      const t = ctx.currentTime, n = src(dur);
+      const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+      const g = ctx.createGain(), d = Math.max(.02, dur * .8);
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + attack);
+      g.gain.exponentialRampToValueAtTime(.0001, t + attack + d);
       const p = ctx.createStereoPanner(); p.pan.value = pan();
       n.connect(f).connect(g).connect(p).connect(bus);
       n.start(t);
     } catch {}
   }
-
-  function tone(freq, dur, o = {}) {
-    const { type = "sine", to = null, gain = 0.05, attack = 0.005 } = o;
+  function tone(fr, dur, o = {}) {
+    const { type = "sine", to = null, gain = .05 } = o;
     if (!ready()) return;
     try {
-      const t = now();
-      const osc = ctx.createOscillator();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, t);
-      if (to) osc.frequency.exponentialRampToValueAtTime(to, t + dur * 0.85);
+      const t = ctx.currentTime, os = ctx.createOscillator();
+      os.type = type; os.frequency.setValueAtTime(fr, t);
+      if (to) os.frequency.exponentialRampToValueAtTime(to, t + dur * .85);
       const g = ctx.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(Math.max(gain, 0.0002), t + attack);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + attack + dur);
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + .005);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .005 + dur);
       const p = ctx.createStereoPanner(); p.pan.value = pan();
-      osc.connect(g).connect(p).connect(bus);
-      osc.start(t); osc.stop(t + dur + 0.12);
+      os.connect(g).connect(p).connect(bus);
+      os.start(t); os.stop(t + dur + .12);
     } catch {}
   }
 
-  function tap(gain = 1) {
-    const t = performance.now();
-    if (t - lastAny < 24) return;
-    lastAny = t;
-    air({ dur: 0.028, freq: jitter(1750, 0.12), q: 1.4, gain: 0.042 * gain, decay: 0.03 });
-    tone(jitter(560, 0.08), 0.07, { to: 300, gain: 0.026 * gain });
-  }
-
-  function press() {
-    const t = performance.now();
-    if (t - lastAny < 24) return;
-    lastAny = t;
-    air({ dur: 0.05, freq: 780, q: 0.9, gain: 0.05, decay: 0.055, type: "lowpass" });
-    tone(jitter(330, 0.07), 0.11, { to: 158, gain: 0.055 });
-    tone(jitter(660, 0.1), 0.06, { type: "triangle", gain: 0.014 });
-  }
-
-  function hover() {
-    const t = performance.now();
-    if (t - lastHover < 90) return;
-    lastHover = t;
-    air({ dur: 0.3, freq: jitter(600, 0.2), q: 0.7, gain: 0.022, attack: 0.07, decay: 0.2 });
-  }
-
-  function whoosh(up = true) {
-    if (!ready()) return;
-    air({ dur: 0.44, freq: up ? 300 : 1500, sweep: up ? 1650 : 240,
-          q: 0.7, gain: 0.06, attack: 0.09, decay: 0.3 });
-  }
-
-  function chime(up = true) {
-    if (!ready()) return;
-    [up ? 784 : 587, up ? 1175 : 440].forEach((f, i) => {
-      setTimeout(() => tone(f, 0.5, { type: "triangle", gain: 0.04 }), i * 70);
-    });
-  }
-
-  function thud() {
-    if (!ready()) return;
-    tone(124, 0.24, { to: 58, gain: 0.075 });
-    air({ dur: 0.09, freq: 400, q: 0.8, gain: 0.045, decay: 0.1, type: "lowpass" });
-  }
-
-  function key() {
-    air({ dur: 0.055, freq: jitter(2700, 0.15), q: 0.8, gain: 0.017, attack: 0.006, decay: 0.05 });
-  }
+  function tap() { const t = performance.now(); if (t - lastAny < 24) return; lastAny = t;
+    air({ dur:.028, freq:jit(1750,.12), q:1.4, gain:.042 }); tone(jit(560,.08), .07, { to:300, gain:.026 }); }
+  function press() { const t = performance.now(); if (t - lastAny < 24) return; lastAny = t;
+    air({ dur:.05, freq:780, q:.9, gain:.05, type:"lowpass" });
+    tone(jit(330,.07), .11, { to:158, gain:.055 });
+    tone(jit(660,.1), .06, { type:"triangle", gain:.014 }); }
+  function hover() { const t = performance.now(); if (t - lastHover < 90) return; lastHover = t;
+    air({ dur:.3, freq:jit(600,.2), q:.7, gain:.022, attack:.07 }); }
+  function whoosh(up) { air({ dur:.44, freq: up ? 300 : 1500, q:.7, gain:.06, attack:.09 }); }
+  function chime(up) { if (!ready()) return;
+    [up ? 784 : 587, up ? 1175 : 440].forEach((f,i) => setTimeout(() => tone(f,.5,{type:"triangle",gain:.04}), i*70)); }
+  function thud() { tone(124,.24,{to:58,gain:.075}); air({dur:.09,freq:400,q:.8,gain:.045,type:"lowpass"}); }
+  function key() { air({ dur:.055, freq:jit(2700,.15), q:.8, gain:.017, attack:.006 }); }
 
   function setVol(v) {
-    vol = Number.isFinite(v) ? cl(v, 0, 1) : 0.6;
+    vol = Number.isFinite(v) ? cl(v,0,1) : .6;
     store.set("rj_vol", vol);
-    if (master) master.gain.value = muted ? 0 : vol * 0.55;
+    if (master) master.gain.value = muted ? 0 : vol * .55;
   }
   function toggleMute() {
-    muted = !muted;
-    store.set("rj_mute", muted);
-    if (master) master.gain.value = muted ? 0 : vol * 0.55;
+    muted = !muted; store.set("rj_mute", muted);
+    if (master) master.gain.value = muted ? 0 : vol * .55;
     if (!muted) chime(true);
     return muted;
   }
-
-  return { tap, press, hover, whoosh, chime, thud, key,
-    tick: tap, thock: press, setVol, toggleMute, boot,
+  return { tap, press, hover, whoosh, chime, thud, key, setVol, toggleMute, boot,
     get muted() { return muted; }, get vol() { return vol; } };
 })();
 
 addEventListener("pointerdown", () => SFX.boot(), { once:true });
 addEventListener("keydown", () => SFX.boot(), { once:true });
 
-/* ═══════════ SOURCES ═══════════ */
+/* ── sources ─────────────────────────────────────────────── */
 const CM      = "https://v3-cinemeta.strem.io";
 const METAHUB = "https://images.metahub.space";
 const APIBAY  = "https://apibay.org";
@@ -570,54 +482,46 @@ const DIRECT = { id:"direct", fn:u => u };
 const RELAYS = [
   { id:"corsproxy", fn:u => "https://corsproxy.io/?url=" + encodeURIComponent(u) },
   { id:"allorigins", fn:u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
-  { id:"codetabs", fn:u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
-  { id:"thingproxy", fn:u => "https://thingproxy.freeboard.io/fetch/" + u },
+  { id:"codetabs", fn:u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) }
 ];
 const TRACKERS = ["udp://tracker.opentrackr.org:1337/announce","udp://open.demonii.com:1337/announce",
   "udp://tracker.openbittorrent.com:6969/announce","udp://exodus.desync.com:6969/announce"];
 
-/* ── PLAYBACK SERVERS ───────────────────────────────────────────────
-   Every player below is framed with referrerpolicy="origin" because
-   most of them issue a short-lived, host-bound gate token and reject
-   a request that arrives with no Referer at all.                    */
+/* players issue a host-bound gate token, so every frame sends a Referer */
 const SERVERS = [
-  { name:"VidSrc",     kind:"imdb",
+  { name:"VidSrc", kind:"imdb",
     m:id=>`https://vidsrc.sh/embed/movie/${id}?autoplay=1`,
     t:(id,s,e)=>`https://vidsrc.sh/embed/tv/${id}/${s}/${e}?autoplay=1` },
-
-  { name:"2Embed",     kind:"imdb",
+  { name:"2Embed", kind:"imdb",
     m:id=>`https://www.2embed.cc/embed/movie/${id}`,
     t:(id,s,e)=>`https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
-
-  { name:"VidLink",    kind:"tmdb",
+  { name:"VidLink", kind:"tmdb",
     m:id=>`https://vidlink.pro/movie/${id}?autoplay=true`,
     t:(id,s,e)=>`https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true` },
-
   { name:"VidSrc Alt", kind:"imdb",
     m:id=>`https://vidsrc.ir/embed/movie/${id}?autoplay=1`,
     t:(id,s,e)=>`https://vidsrc.ir/embed/tv/${id}/${s}/${e}?autoplay=1` },
-
-  { name:"Videasy",    kind:"tmdb",
+  { name:"Videasy", kind:"tmdb",
     m:id=>`https://player.videasy.net/movie/${id}`,
     t:(id,s,e)=>`https://player.videasy.net/tv/${id}/${s}/${e}` },
-
-  { name:"EmbedWave",  kind:"tmdb",
+  { name:"EmbedWave", kind:"tmdb",
     m:id=>`https://embedwave.cc/embed/movie/${id}?autoplay=1`,
     t:(id,s,e)=>`https://embedwave.cc/embed/tv/${id}/${s}/${e}?autoplay=1` },
-
   { name:"SuperEmbed", kind:"imdb",
     m:id=>`https://multiembed.mov/?video_id=${id}`,
-    t:(id,s,e)=>`https://multiembed.mov/?video_id=${id}&s=${s}&e=${e}` },
+    t:(id,s,e)=>`https://multiembed.mov/?video_id=${id}&s=${s}&e=${e}` }
 ];
 
-const GENRES = {
-  movie:["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama","Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western"],
-  series:["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama","Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western","Reality-TV","Talk-Show","Game-Show"],
-};
+const GENRES = ["Action","Adventure","Animation","Biography","Comedy","Crime","Documentary","Drama",
+  "Family","Fantasy","History","Horror","Mystery","Romance","Sci-Fi","Sport","Thriller","War","Western"];
+const S_GENRES = GENRES.concat(["Reality-TV","Talk-Show","Game-Show"]);
+const DECADES = ["2020s","2010s","2000s","1990s","1980s","1970s","1960s","1950s","1940s"];
+const Y = new Date().getFullYear();
+const decadeYears = d => { const s = +d.slice(0,4), out = [];
+  for (let y = Math.min(s + 9, Y); y >= s; y--) out.push(y); return out; };
 
-/* ═══════════ UTIL ═══════════ */
-const $  = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
+/* ── util ────────────────────────────────────────────────── */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const isEl = n => n instanceof Element;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const bytes = n => { n=+n||0; const u=["B","KB","MB","GB","TB"]; let i=0; while(n>=1024&&i<4){n/=1024;i++;} return n.toFixed(i?1:0)+" "+u[i]; };
@@ -625,141 +529,88 @@ const magnet = (h,n) => "magnet:?xt=urn:btih:"+h+"&dn="+encodeURIComponent(n||""
 const qOf = s => (/2160p|4k|uhd/i.test(s)?"2160p":/1080p/i.test(s)?"1080p":/720p/i.test(s)?"720p":/480p|dvdrip/i.test(s)?"480p":"");
 const yearOf = it => (it.releaseInfo || it.year || "").toString().slice(0,4);
 const pctOf = it => it.imdbRating ? Math.round(parseFloat(it.imdbRating) * 10) : 0;
-const minsOf = rt => { const n = parseInt(String(rt||"").replace(/\D+/g,""), 10); return Number.isFinite(n) && n > 0 ? n : 0; };
-const clamp = cl;
+const minsOf = rt => { const n = parseInt(String(rt||"").replace(/\D+/g,""), 10); return n > 0 ? n : 0; };
 const human = ms => { const m = Math.round(ms/60000); return m >= 60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m}m`; };
 
 function toast(m, k = "") {
-  const host = $("#toasts");
-  if (!host) return;
+  const h = $("#toasts"); if (!h) return;
   const t = document.createElement("div");
-  t.className = "toast " + k;
-  t.textContent = m;
-  host.appendChild(t);
-  k === "err" ? SFX.thud() : SFX.tap(0.7);
-  setTimeout(() => {
-    t.style.opacity = 0;
-    t.style.transform = "translateY(10px)";
-    setTimeout(() => t.remove(), 300);
-  }, 2200);
+  t.className = "toast " + k; t.textContent = m;
+  h.appendChild(t);
+  k === "err" ? SFX.thud() : SFX.tap();
+  setTimeout(() => t.remove(), 2200);
 }
 
 const posterLadder = id => [`${METAHUB}/poster/medium/${id}/img`, `${METAHUB}/poster/small/${id}/img`];
-const posterAttrs = (id, title) =>
+const posterAttrs = (id, t) =>
   `loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${esc(posterLadder(id)[0])}"
-   data-lad="${esc(id)}" data-step="0" data-title="${esc(title)}" alt="${esc(title)}"`;
+   data-lad="${esc(id)}" data-step="0" data-title="${esc(t)}" alt="${esc(t)}"`;
 
-/* ═══════════ STORE ═══════════ */
+/* ── store ───────────────────────────────────────────────── */
 const myList   = () => store.get("rj_list", []);
 const inList   = id => myList().some(x => x.id === id);
 const contList = () => store.get("rj_cont", []);
 
-function saveCont(list) {
-  const now = Date.now();
-  store.set("rj_cont", list.filter(c => now - c.updatedAt < 60 * 864e5)
-    .sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 24));
-}
+function saveCont(l) { const n = Date.now(); store.set("rj_cont", l.filter(c => n - c.updatedAt < 60*864e5).slice(0,24)); }
 function progressOf(c) {
-  const expected = Math.max(c.expectedMs || 45 * 60000, 60000);
-  const frac = clamp((Date.now() - c.startedAt) / expected, 0, 1);
-  if (c.type === "series") {
-    const total = Math.max(c.totalEps || 1, 1);
-    return clamp(((c.epIndex || 0) + frac) / total * 100, 0, 100);
-  }
-  return frac * 100;
+  const ex = Math.max(c.expectedMs || 45*6e4, 6e4);
+  const f = cl((Date.now() - c.startedAt) / ex, 0, 1);
+  if (c.type === "series") { const t = Math.max(c.totalEps || 1, 1); return cl(((c.epIndex||0) + f) / t * 100, 0, 100); }
+  return f * 100;
 }
 function upsertCont(item, season, episode, epIndex) {
-  const list = contList();
-  const i = list.findIndex(c => c.id === item.id);
-  const prev = i > -1 ? list[i] : null;
-  const entry = {
-    id:item.id, type:item.type, name:item.name || prev?.name || "Untitled",
-    poster:item.poster || prev?.poster || "",
-    season:season ?? prev?.season ?? null, episode:episode ?? prev?.episode ?? null,
-    epIndex:epIndex ?? prev?.epIndex ?? 0,
-    totalEps:(item.videos || []).length || prev?.totalEps || 0,
-    expectedMs:minsOf(item.runtime || (item.type === "series" ? 45 : 120)) * 60000,
-    startedAt:Date.now(), updatedAt:Date.now(),
+  const l = contList(), i = l.findIndex(c => c.id === item.id), p = i > -1 ? l[i] : null;
+  const e = {
+    id:item.id, type:item.type, name:item.name || p?.name || "Untitled", poster:item.poster || p?.poster || "",
+    season:season ?? p?.season ?? null, episode:episode ?? p?.episode ?? null, epIndex:epIndex ?? p?.epIndex ?? 0,
+    totalEps:(item.videos || []).length || p?.totalEps || 0,
+    expectedMs:minsOf(item.runtime || (item.type === "series" ? 45 : 120)) * 6e4,
+    startedAt:Date.now(), updatedAt:Date.now()
   };
-  if (i > -1) list[i] = entry; else list.unshift(entry);
-  saveCont(list);
-  renderContinue();
-}
-function removeCont(id) {
-  saveCont(contList().filter(c => c.id !== id));
-  const nodes = $$(`.card[data-id="${CSS.escape(id)}"]`);
-  nodes.forEach(el => {
-    el.style.transition = "opacity .22s, transform .22s";
-    el.style.opacity = "0";
-    el.style.transform = "scale(.9)";
-  });
-  setTimeout(() => { renderContinue(); nodes.forEach(n => n.remove()); }, 230);
-  toast("Removed from Continue Watching");
+  if (i > -1) l[i] = e; else l.unshift(e);
+  saveCont(l); renderContinue();
 }
 
-/* ═══════════ TRANSPORT ═══════════ */
+/* ── transport ───────────────────────────────────────────── */
 let directOK = null;
 const cache = new Map();
-
-async function tryRoute(route, url) {
-  const r = await fetch(route.fn(url), { signal: timeoutSignal(route.id === "direct" ? 7000 : 14000) });
-  if (!r.ok) throw new Error(route.id + " " + r.status);
-  return r.json();
-}
 async function getJSON(url, tries = 2) {
   if (cache.has(url)) return cache.get(url);
   const routes = directOK === false ? RELAYS : [DIRECT, ...RELAYS];
-  let lastErr;
-  for (let a = 0; a < tries; a++) {
-    for (const route of routes) {
-      try {
-        const j = await tryRoute(route, url);
-        directOK = route.id === "direct";
-        cache.set(url, j);
-        return j;
-      } catch (err) {
-        if (route.id === "direct") directOK = false;
-        lastErr = err;
-      }
-    }
+  let err;
+  for (let a = 0; a < tries; a++) for (const r of routes) {
+    try {
+      const res = await fetch(r.fn(url), { signal: timeoutSignal(r.id === "direct" ? 7000 : 14000) });
+      if (!res.ok) throw new Error(res.status);
+      const j = await res.json();
+      directOK = r.id === "direct"; cache.set(url, j); return j;
+    } catch (e) { if (r.id === "direct") directOK = false; err = e; }
   }
-  throw lastErr || new Error("unreachable");
+  throw err || new Error("unreachable");
 }
-const catalog = (type, o = {}) => {
-  const p = [];
-  if (o.genre) p.push("genre=" + encodeURIComponent(o.genre));
-  if (o.search) p.push("search=" + encodeURIComponent(o.search));
-  if (o.skip) p.push("skip=" + o.skip);
-  return getJSON(`${CM}/catalog/${type}/${o.cat || "top"}.json` + (p.length ? "/" + p.join("&") : ""));
-};
-const metaOf = (type, id) => getJSON(`${CM}/meta/${type}/${id}.json`, 2).then(j => j.meta || j);
-const itemCache = new Map();
+/* extras go after the catalog id, joined with & */
+const catUrl = (type, cat, extras = []) =>
+  `${CM}/catalog/${type}/${cat}.json` + (extras.length ? "/" + extras.join("&") : "");
 
-/* ═══════════ CARD ═══════════ */
+/* ── card ────────────────────────────────────────────────── */
+const itemCache = new Map();
 function card(o, opts = {}) {
   const type = o.type === "series" ? "series" : "movie";
-  const title = o.name || "Untitled";
-  const p = pctOf(o);
-  const on = inList(o.id);
-  const cont = contList().find(c => c.id === o.id);
-  const prog = cont ? progressOf(cont) : 0;
-  const done = prog >= 95;
+  const title = o.name || "Untitled", p = pctOf(o);
+  const on = inList(o.id), cont = contList().find(c => c.id === o.id), prog = cont ? progressOf(cont) : 0;
   itemCache.set(o.id, o);
   const art = o.poster ? `<img ${posterAttrs(o.id, title)}>` : `<div class="ph">${esc(title)}</div>`;
-  const where = cont?.type === "series" && cont.episode ? `S${cont.season} E${cont.episode}` : "";
-  return `<article class="card ${done ? "watched" : ""}" data-id="${esc(o.id)}" data-type="${type}">
+  return `<article class="card" data-id="${esc(o.id)}" data-type="${type}">
     <div class="art">${art}
       ${o.imdbRating ? `<span class="badge hd">${esc(o.imdbRating)}</span>` : ""}
-      ${opts.cont
-        ? `<button class="kill" data-kill="${esc(o.id)}" title="Remove">✕</button>`
-        : `<button class="fav ${on?"on":""}" data-fav="${esc(o.id)}" title="My List">★</button>`}
-      <div class="prev" data-prev="${esc(o.id)}"></div>
+      ${opts.cont ? `<button class="kill" data-kill="${esc(o.id)}" title="Remove">✕</button>`
+                  : `<button class="fav ${on?"on":""}" data-fav="${esc(o.id)}" title="My List">★</button>`}
+      <div class="prev"></div>
       ${prog ? `<div class="bar"><i style="width:${prog.toFixed(1)}%"></i></div>` : ""}
       <div class="info">
         <div class="t">${esc(title)}</div>
         <div class="r">${p?`<span class="match">${p}%</span>`:""}<span>${esc(yearOf(o))}</span>
-          <span class="badge" style="position:static">${type==="series"?"Series":"Film"}</span></div>
-        ${where ? `<div class="cont-label">${esc(where)} · ${Math.round(100 - prog)}% left</div>` : ""}
+          <span>${type==="series"?"Series":"Film"}</span></div>
         <div class="acts2">
           <button data-play="${esc(o.id)}" data-ptype="${type}" title="Play">▶</button>
           <button data-open="${esc(o.id)}" data-ot="${type}" title="Details">ⓘ</button>
@@ -774,95 +625,52 @@ function card(o, opts = {}) {
 document.addEventListener("error", e => {
   const img = e.target;
   if (!(img instanceof HTMLImageElement) || !img.dataset.lad) return;
-  const step = +img.dataset.step + 1;
-  const ladder = posterLadder(img.dataset.lad);
-  if (step < ladder.length) { img.dataset.step = step; img.src = ladder[step]; return; }
+  const step = +img.dataset.step + 1, l = posterLadder(img.dataset.lad);
+  if (step < l.length) { img.dataset.step = step; img.src = l[step]; return; }
   const ph = document.createElement("div");
-  ph.className = "ph";
-  ph.textContent = img.dataset.title || "";
+  ph.className = "ph"; ph.textContent = img.dataset.title || "";
   img.replaceWith(ph);
 }, true);
 
-/* ═══════════ HOVER PREVIEW ═══════════
-   A still frame paints immediately and always succeeds; the muted
-   trailer fades in over it only once it has actually loaded.       */
-let prevTimer, prevBox, prevId;
-
+/* ── hover preview ───────────────────────────────────────── */
+let pvT, pvBox, pvId;
 function hidePreview() {
-  clearTimeout(prevTimer);
-  const box = prevBox;
-  prevBox = null;
-  prevId = null;
-  if (!box) return;
-  box.classList.remove("on");
-  setTimeout(() => { if (!box.classList.contains("on")) box.innerHTML = ""; }, 420);
+  clearTimeout(pvT);
+  const b = pvBox; pvBox = null; pvId = null;
+  if (!b) return;
+  b.classList.remove("on");
+  setTimeout(() => { if (!b.classList.contains("on")) b.innerHTML = ""; }, 420);
 }
-
-function previewStill(box, url) {
-  const img = document.createElement("img");
-  img.className = "still";
-  img.alt = "";
-  img.referrerPolicy = "no-referrer";
-  img.src = url;
-  box.appendChild(img);
-}
-
-async function runPreview(cardEl, id, type) {
-  const box = cardEl.querySelector(".prev");
-  if (!box) return;
-
+async function runPreview(c, id, type) {
+  const box = c.querySelector(".prev"); if (!box) return;
   const seed = itemCache.get(id) || {};
-  const coarse = window.matchMedia && window.matchMedia("(pointer:coarse)").matches;
+  const coarse = matchMedia && matchMedia("(pointer:coarse)").matches;
   const still = seed.background || seed.poster || "";
-
-  if (still) { previewStill(box, still); box.classList.add("on"); }
-
-  let m = seed;
-  try { m = { ...seed, ...(await metaOf(type, id)) }; } catch {}
-  if (prevId !== id) return;
-
-  const wide = m.background || m.poster || "";
-  if (wide && wide !== still) {
-    const old = box.querySelector("img.still");
-    if (old) old.src = wide; else previewStill(box, wide);
-    box.classList.add("on");
+  if (still) {
+    const im = document.createElement("img");
+    im.className = "still"; im.referrerPolicy = "no-referrer"; im.src = still;
+    box.appendChild(im); box.classList.add("on");
   }
-  if (!box.classList.contains("on")) return;
-  if (coarse) return;
-
-  const tr = [...(m.trailers || []), ...(m.trailerStreams || [])].find(x => x && x.source);
+  let m = seed;
+  try { m = { ...seed, ...(await getJSON(`${CM}/meta/${type}/${id}.json`, 1)).meta }; } catch {}
+  if (pvId !== id || coarse) return;
+  const tr = (m.trailers || []).find(x => x && x.source);
   if (!tr) return;
-
-  const origin = location.protocol.startsWith("http")
-    ? `&origin=${encodeURIComponent(location.origin)}` : "";
-
-  const frame = document.createElement("iframe");
-  frame.title = "";
-  frame.allow = "autoplay; encrypted-media";
-  frame.setAttribute("allowfullscreen", "");
-  frame.referrerPolicy = "origin";
-  frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(tr.source)}` +
-    `?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3` +
-    `&loop=1&playlist=${encodeURIComponent(tr.source)}${origin}`;
-  frame.addEventListener("load", () => frame.classList.add("on"), { once:true });
-  box.appendChild(frame);
+  const f = document.createElement("iframe");
+  f.referrerPolicy = "origin";
+  f.allow = "autoplay; encrypted-media";
+  f.src = `https://www.youtube-nocookie.com/embed/${tr.source}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${tr.source}`;
+  f.addEventListener("load", () => f.classList.add("on"), { once:true });
+  box.appendChild(f);
 }
-
 document.addEventListener("mouseover", e => {
   if (!isEl(e.target)) return;
   const c = e.target.closest(".card");
-  if (!c || c.closest("#modal")) return;
-  if (prevId === c.dataset.id) return;
-  hidePreview();
-  prevId = c.dataset.id;
-  SFX.hover();
+  if (!c || c.closest("#modal") || pvId === c.dataset.id) return;
+  hidePreview(); pvId = c.dataset.id; SFX.hover();
   const box = c.querySelector(".prev");
-  prevTimer = setTimeout(() => {
-    prevBox = box;
-    runPreview(c, c.dataset.id, c.dataset.type);
-  }, 480);
+  pvT = setTimeout(() => { pvBox = box; runPreview(c, c.dataset.id, c.dataset.type); }, 480);
 });
-
 document.addEventListener("mouseout", e => {
   if (!isEl(e.target)) return;
   const c = e.target.closest(".card");
@@ -871,482 +679,440 @@ document.addEventListener("mouseout", e => {
   hidePreview();
 });
 
-/* ═══════════ BILLBOARD ═══════════ */
-async function billboard() {
-  try {
-    const j = await catalog("movie");
-    const pool = (j.metas || []).filter(x => x.background).slice(0, 8);
-    if (!pool.length) return;
-    const o = pool[Math.floor(Math.random() * pool.length)];
-    itemCache.set(o.id, o);
-    const p = pctOf(o);
-    const cont = contList().find(c => c.id === o.id);
-    $("#bill").innerHTML = `
-      <div class="bd" style="background-image:url('${esc(o.background)}')"></div>
-      <div class="inner">
-        ${o.logo ? `<img class="logo" src="${esc(o.logo)}" alt="${esc(o.name)}" referrerpolicy="no-referrer">` : `<h1>${esc(o.name)}</h1>`}
-        <div class="m">
-          ${p?`<span class="match">${p}% match</span>`:""}
-          <span>${esc(yearOf(o))}</span><span class="tagline">Film</span><span>HD</span>
-          ${o.runtime?`<span>${esc(o.runtime)}</span>`:""}
-        </div>
-        <p>${esc(o.description || "")}</p>
-        <div class="acts">
-          <button class="btn light" data-play="${esc(o.id)}" data-ptype="movie">
-            ▶ ${cont ? "Resume" : "Play"}</button>
-          <button class="btn" data-open="${esc(o.id)}" data-ot="movie">ⓘ More info</button>
-          <button class="btn" id="muteTgl" title="Trailer">🔇</button>
-        </div>
-      </div>`;
-    setTimeout(async () => {
-      try {
-        const t = (o.trailers || []).find(x => x.type === "Trailer") || (o.trailers || [])[0];
-        if (!t) return;
-        const f = document.createElement("iframe");
-        f.src = `https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&mute=1&controls=0&loop=1&playlist=${t.source}&modestbranding=1&playsinline=1`;
-        f.allow = "autoplay; encrypted-media";
-        f.title = "trailer";
-        $("#bill").prepend(f);
-        requestAnimationFrame(() => f.classList.add("on"));
-        $("#muteTgl")?.addEventListener("click", ev => {
-          const on = f.classList.contains("on");
-          f.classList.toggle("on", !on);
-          ev.currentTarget.textContent = on ? "🔇" : "🔊";
-        });
-      } catch {}
-    }, 2000);
-  } catch {}
-}
+/* ── home ────────────────────────────────────────────────── */
+const seenHome = new Set();
+function view(html) { $("#main").innerHTML = html; }
+const greet = () => { const h = new Date().getHours();
+  return h < 5 ? "Up late" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
-/* ═══════════ CONTINUE WATCHING ═══════════ */
-function renderContinue() {
-  const host = $("#contRow");
-  if (!host) return;
-  const list = contList().filter(c => progressOf(c) < 97);
-  if (!list.length) { host.classList.add("hide"); host.innerHTML = ""; return; }
-  host.classList.remove("hide");
-  host.innerHTML = `<div class="rowhead"><h2>Continue Watching</h2>
-      <button class="more" id="clearCont">Clear all</button></div>
-    <div class="rail">${list.map(c => card(
-      { id:c.id, type:c.type, name:c.name, poster:c.poster }, { cont:true })).join("")}</div>`;
-  $("#clearCont").onclick = () => { saveCont([]); renderContinue(); SFX.thud(); toast("Continue Watching cleared"); };
-}
-
-let currentId = null;
-setInterval(() => {
-  const open = contList().find(c => c.id === currentId);
-  if (!open) return;
-  const pct = progressOf(open);
-  $$(`.card[data-id="${CSS.escape(open.id)}"] .bar i`).forEach(b => b.style.width = pct.toFixed(1) + "%");
-  const label = $("#resumeLabel");
-  if (label) label.textContent = `${Math.round(100 - pct)}% left · ${human(open.expectedMs * (1 - pct/100))} remaining`;
-}, 15000);
-
-/* ═══════════ ROWS ═══════════ */
-const rowShell = (t, id) => `<section class="row"><div class="rowhead"><h2>${esc(t)}</h2></div>
-  <div class="rail" id="${id}">${Array.from({length:8},()=>'<div class="sk"></div>').join("")}</div></section>`;
+/* every row is a distinct catalog query — the library is the sum of them */
+const HOME = [
+  ["Trending Now","movie",[{}]],
+  ["Popular Series","series",[{}]],
+  ["New Releases","movie",[{cat:"year",genre:String(Y)},{cat:"year",genre:String(Y-1)}]],
+  ["New Series","series",[{cat:"year",genre:String(Y)},{cat:"year",genre:String(Y-1)}]],
+  ["Top Rated Films","movie",[{cat:"imdbRating"}]],
+  ["Top Rated Series","series",[{cat:"imdbRating"}]],
+  ...GENRES.map(g => [g,"movie",[{genre:g}]]),
+  ...["Action","Comedy","Crime","Drama","Mystery","Sci-Fi","Thriller","Romance"].map(g => [`${g} Series`,"series",[{genre:g}]]),
+  ["Films of the 2020s","movie",[{cat:"year",genre:String(Y-1)},{cat:"year",genre:String(Y-2)}]],
+  ["Films of the 2010s","movie",[{cat:"year",genre:"2016"},{cat:"year",genre:"2013"}]],
+  ["Films of the 2000s","movie",[{cat:"year",genre:"2006"},{cat:"year",genre:"2003"}]],
+  ["Films of the 1990s","movie",[{cat:"year",genre:"1996"},{cat:"year",genre:"1993"}]],
+  ["Films of the 1980s","movie",[{cat:"year",genre:"1986"},{cat:"year",genre:"1983"}]],
+  ["Series of the 2010s","series",[{cat:"year",genre:"2016"},{cat:"year",genre:"2013"}]],
+  ["Series of the 2000s","series",[{cat:"year",genre:"2006"},{cat:"year",genre:"2003"}]]
+];
 
 async function fillRow(id, type, steps) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  for (const step of steps) {
+  const el = document.getElementById(id); if (!el) return;
+  for (const st of steps) {
     try {
-      const j = await catalog(type, step);
-      const items = (j.metas || []).filter(x => x.poster);
+      const ex = [];
+      if (st.genre) ex.push("genre=" + encodeURIComponent(st.genre));
+      const j = await getJSON(catUrl(type, st.cat || "top", ex), 1);
+      const items = (j.metas || []).filter(x => x.poster && !seenHome.has(x.id));
       if (!items.length) continue;
+      items.forEach(x => seenHome.add(x.id));
       el.innerHTML = items.slice(0, 24).map(x => card(x)).join("");
       return;
     } catch {}
   }
-  el.innerHTML = `<div class="rowfail"><span>Couldn't load this row.</span>
-    <button data-retry="${id}" data-type="${type}">Retry</button></div>`;
-  el.dataset.steps = JSON.stringify(steps);
-}
-
-const Y = new Date().getFullYear();
-const HOME = [
-  ["Trending Now",        "movie",  [{}]],
-  ["Popular Series",      "series", [{}]],
-  ["New Releases",        "movie",  [{ cat:"year", genre:String(Y) }, { cat:"year", genre:String(Y-1) }]],
-  ["New Series",          "series", [{ cat:"year", genre:String(Y) }, { cat:"year", genre:String(Y-1) }]],
-  ["Action & Adventure",  "movie",  [{ genre:"Action" }, { genre:"Adventure" }]],
-  ["Top Rated",           "movie",  [{ cat:"imdbRating" }, {}]],
-  ["Binge-worthy Series", "series", [{ cat:"imdbRating" }, {}]],
-  ["Comedy",              "movie",  [{ genre:"Comedy" }]],
-  ["Horror",              "movie",  [{ genre:"Horror" }]],
-  ["Sci-Fi",              "movie",  [{ genre:"Sci-Fi" }]],
-  ["Animation",           "movie",  [{ genre:"Animation" }]],
-  ["Drama",               "movie",  [{ genre:"Drama" }]],
-];
-
-const greeting = () => {
-  const h = new Date().getHours();
-  if (h < 5) return "Up late";
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
-};
-
-function view(html) {
-  const main = $("#main");
-  if (!main) return;
-  main.innerHTML = html;
-  main.classList.remove("view");
-  void main.offsetWidth;
-  main.classList.add("view");
+  el.closest(".row")?.classList.add("hide");
 }
 
 async function renderHome() {
+  seenHome.clear();
   $("#bill").classList.remove("hide");
-  view(`<div class="greet">${greeting()} · pull up something warm</div>
+  view(`<div class="greet">${greet()} · pull up something warm</div>
     <section class="row hide" id="contRow"></section>`
-    + HOME.map(([t], i) => rowShell(t, "r" + i)).join(""));
+    + HOME.map(([t], i) => `<section class="row"><div class="rowhead"><h2>${esc(t)}</h2></div>
+      <div class="rail" id="r${i}">${'<div class="sk"></div>'.repeat(8)}</div></section>`).join(""));
   renderContinue();
-  HOME.forEach(([,, steps], i) => {
-    if (i < 3) fillRow("r" + i, HOME[i][1], steps);
-    else setTimeout(() => fillRow("r" + i, HOME[i][1], steps), 60 * i);
+  HOME.forEach(([, , steps], i) => {
+    if (i < 4) fillRow("r" + i, HOME[i][1], steps);
+    else setTimeout(() => fillRow("r" + i, HOME[i][1], steps), 110 * i);
   });
   billboard();
 }
 
-/* ═══════════ BROWSE / LIST / SEARCH ═══════════ */
-async function renderBrowse(type) {
-  $("#bill").classList.add("hide");
-  view(`<h3 class="page-h">${type==="movie"?"Movies":"Series"}</h3>
-    <div class="chips" id="gchips"><button class="on" data-g="">Popular</button>${
-      GENRES[type].map(g => `<button data-g="${g}">${g}</button>`).join("")}</div>
-    <div class="grid" id="bgrid"></div>`);
-  const load = async g => {
-    $("#bgrid").innerHTML = Array.from({length:18},()=>'<div class="sk"></div>').join("");
-    try {
-      const j = await catalog(type, g ? { genre:g } : {});
-      const items = (j.metas || []).filter(x => x.poster);
-      $("#bgrid").innerHTML = items.map(x => card(x)).join("")
-        || `<div class="empty" style="grid-column:1/-1"><b>Nothing here</b>Try another shelf.</div>`;
-    } catch {
-      $("#bgrid").innerHTML = `<div class="empty" style="grid-column:1/-1">
-        <b>Couldn't load</b><button class="btn sm" id="bgRetry" style="margin-top:10px">Retry</button></div>`;
-      $("#bgRetry").onclick = () => load(g);
-    }
-  };
-  $("#gchips").onclick = e => {
-    const b = isEl(e.target) ? e.target.closest("button") : null;
-    if (!b) return;
-    $$("#gchips button").forEach(c => c.classList.toggle("on", c === b));
-    load(b.dataset.g);
-  };
-  load("");
+async function billboard() {
+  try {
+    const j = await getJSON(catUrl("movie", "top"), 1);
+    const pool = (j.metas || []).filter(x => x.background).slice(0, 10);
+    if (!pool.length) return;
+    const o = pool[Math.floor(Math.random() * pool.length)];
+    itemCache.set(o.id, o);
+    const p = pctOf(o), cont = contList().find(c => c.id === o.id);
+    $("#bill").innerHTML = `<div class="bd" style="background-image:url('${esc(o.background)}')"></div>
+      <div class="inner">
+        <h1>${esc(o.name)}</h1>
+        <div class="m">${p?`<span class="match">${p}% match</span>`:""}
+          <span>${esc(yearOf(o))}</span><span class="tagline">Film</span>
+          ${o.runtime?`<span>${esc(o.runtime)}</span>`:""}</div>
+        <p>${esc(o.description || "")}</p>
+        <div class="acts">
+          <button class="btn light" data-play="${esc(o.id)}" data-ptype="movie">▶ ${cont?"Resume":"Play"}</button>
+          <button class="btn" data-open="${esc(o.id)}" data-ot="movie">ⓘ More info</button>
+        </div>
+      </div>`;
+  } catch {}
 }
 
+/* ── continue watching ───────────────────────────────────── */
+function renderContinue() {
+  const h = $("#contRow"); if (!h) return;
+  const l = contList().filter(c => progressOf(c) < 97);
+  if (!l.length) { h.classList.add("hide"); h.innerHTML = ""; return; }
+  h.classList.remove("hide");
+  h.innerHTML = `<div class="rowhead"><h2>Continue Watching</h2>
+      <button class="more" id="clearCont">Clear all</button></div>
+    <div class="rail">${l.map(c => card({ id:c.id, type:c.type, name:c.name, poster:c.poster }, { cont:true })).join("")}</div>`;
+  $("#clearCont").onclick = () => { saveCont([]); renderContinue(); toast("Cleared"); };
+}
+
+let currentId = null;
+setInterval(() => {
+  const o = contList().find(c => c.id === currentId); if (!o) return;
+  const pct = progressOf(o);
+  $$(`.card[data-id="${CSS.escape(o.id)}"] .bar i`).forEach(b => b.style.width = pct.toFixed(1) + "%");
+  const lb = $("#resumeLabel");
+  if (lb) lb.textContent = `${Math.round(100-pct)}% left · ${human(o.expectedMs*(1-pct/100))} remaining`;
+}, 15000);
+
+/* ── discover: paginated, deep library ───────────────────── */
+let bs = { type:"movie", genre:"", decade:"", sort:"popular", cursor:0, seen:new Set(), busy:false, done:false };
+
+function pageUrl(st) {
+  let cat = "top";
+  const ex = [];
+  if (st.decade) {
+    cat = "year";
+    const ys = decadeYears(st.decade);
+    ex.push("genre=" + ys[st.cursor % ys.length]);
+    const sk = Math.floor(st.cursor / ys.length) * 30;
+    if (sk) ex.push("skip=" + sk);
+  } else if (st.sort === "rated") {
+    cat = "imdbRating";
+    if (st.genre) ex.push("genre=" + encodeURIComponent(st.genre));
+    if (st.cursor) ex.push("skip=" + (st.cursor * 30));
+  } else if (st.sort === "newest") {
+    cat = "year";
+    ex.push("genre=" + (Y - (st.cursor % 10)));
+    const sk = Math.floor(st.cursor / 10) * 30;
+    if (sk) ex.push("skip=" + sk);
+  } else {
+    if (st.genre) ex.push("genre=" + encodeURIComponent(st.genre));
+    if (st.cursor) ex.push("skip=" + (st.cursor * 30));
+  }
+  return catUrl(st.type, cat, ex);
+}
+
+async function loadPage() {
+  if (bs.busy || bs.done) return;
+  bs.busy = true;
+  const grid = $("#bgrid"), more = $("#bmore");
+  try {
+    const j = await getJSON(pageUrl(bs), 1);
+    const raw = (j.metas || []).filter(x => x.poster);
+    const fresh = raw.filter(x => !bs.seen.has(x.id));
+    fresh.forEach(x => bs.seen.add(x.id));
+    if (!raw.length) bs.done = true;
+    if (grid && fresh.length) grid.insertAdjacentHTML("beforeend", fresh.map(x => card(x)).join(""));
+    else if (grid && !grid.children.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Nothing here</b>Try another filter.</div>`;
+      bs.done = true;
+    }
+    bs.cursor++;
+    if (bs.seen.size >= 600) bs.done = true;
+  } catch {
+    if (grid && !grid.children.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Couldn't load</b>
+        <button class="btn sm" id="bRetry" style="margin-top:10px">Retry</button></div>`;
+    }
+    bs.done = true;
+  }
+  bs.busy = false;
+  if (more) more.innerHTML = bs.done
+    ? `<span class="count">That's everything for this filter.</span>`
+    : `<button class="btn sm" id="bMore">Load more</button>`;
+  const b = $("#bMore"); if (b) b.onclick = loadPage;
+  const r = $("#bRetry"); if (r) r.onclick = () => { bs.done = false; loadPage(); };
+}
+
+function renderBrowse(type) {
+  bs = { type, genre:"", decade:"", sort:"popular", cursor:0, seen:new Set(), busy:false, done:false };
+  $("#bill").classList.add("hide");
+  view(`<h3 class="page-h">${type==="movie"?"Movies":"Series"}</h3>
+    <div class="chips" id="gchips"><span class="lab">Genre</span><button class="on" data-g="">Any</button>${
+      (type === "movie" ? GENRES : S_GENRES).map(g => `<button data-g="${esc(g)}">${esc(g)}</button>`).join("")}</div>
+    <div class="chips" id="dchips"><span class="lab">Era</span><button class="on" data-d="">Any</button>${
+      DECADES.map(d => `<button data-d="${d}">${d}</button>`).join("")}</div>
+    <div class="chips" id="schips"><span class="lab">Sort</span>
+      <button class="on" data-s="popular">Popular</button>
+      <button data-s="rated">Top rated</button>
+      <button data-s="newest">Newest</button></div>
+    <div class="grid" id="bgrid"></div>
+    <div class="morewrap" id="bmore"></div>`);
+
+  const relist = () => { $("#bgrid").innerHTML = ""; bs.cursor = 0; bs.seen = new Set(); bs.done = false; loadPage(); };
+
+  $("#gchips").onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $$("#gchips button").forEach(x => x.classList.toggle("on", x === b));
+    bs.genre = b.dataset.g;
+    if (bs.genre) { bs.decade = ""; $$("#dchips button").forEach(x => x.classList.toggle("on", x.dataset.d === "")); }
+    relist();
+  };
+  $("#dchips").onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $$("#dchips button").forEach(x => x.classList.toggle("on", x === b));
+    bs.decade = b.dataset.d;
+    if (bs.decade) { bs.genre = ""; $$("#gchips button").forEach(x => x.classList.toggle("on", x.dataset.g === "")); }
+    relist();
+  };
+  $("#schips").onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $$("#schips button").forEach(x => x.classList.toggle("on", x === b));
+    bs.sort = b.dataset.s; relist();
+  };
+  loadPage();
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(en => { if (en[0].isIntersecting) loadPage(); }, { rootMargin:"700px" })
+      .observe($("#bmore"));
+  }
+}
+
+/* ── list ────────────────────────────────────────────────── */
 function renderList() {
   $("#bill").classList.add("hide");
   const items = myList();
   view(`<h3 class="page-h">My List</h3>
     ${items.length ? `<div style="padding:12px 4% 0"><button class="btn sm" id="expBtn">Export list</button></div>` : ""}
-    <div class="grid" id="lgrid">${
-      items.length ? items.map(x => card(x)).join("")
-      : `<div class="empty" style="grid-column:1/-1"><b>Your list is empty</b>Tap the ★ on anything to keep it here.</div>`
-    }</div>`);
+    <div class="grid" id="lgrid">${items.length ? items.map(x => card(x)).join("")
+      : `<div class="empty" style="grid-column:1/-1"><b>Your list is empty</b>Tap ★ on anything to keep it here.</div>`}</div>`);
   $("#expBtn")?.addEventListener("click", () => {
     try {
-      const blob = new Blob([JSON.stringify(items, null, 2)], { type:"application/json" });
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "reeljack-list.json";
-      a.click();
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(items, null, 2)], { type:"application/json" }));
+      a.download = "reeljack-list.json"; a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
       toast("List exported", "ok");
     } catch { toast("Export failed", "err"); }
   });
 }
 
+/* ── search: paginated ───────────────────────────────────── */
 function renderSearch() {
   $("#bill").classList.add("hide");
+  let cursor = 0, seen = new Set(), done = false, busy = false;
   view(`<h3 class="page-h">Search</h3>
     <div style="padding:14px 4% 0"><input id="sq" placeholder="Movies, series…" autocomplete="off"
       style="width:100%;max-width:560px;padding:13px 16px;border-radius:99px;border:1px solid var(--line2);
-      background:rgba(255,238,220,.05);color:var(--txt);font-size:15px;outline:none;transition:.2s"></div>
-    <div class="grid" id="sgrid"></div>`);
-  const input = $("#sq");
-  if (!input) return;
-  input.focus();
-  input.onfocus = () => input.style.borderColor = "var(--amber)";
-  input.onblur = () => input.style.borderColor = "var(--line2)";
-  let t;
-  input.oninput = () => {
-    clearTimeout(t);
-    t = setTimeout(async () => {
-      const q = input.value.trim();
-      if (q.length < 2) { $("#sgrid").innerHTML = ""; return; }
-      $("#sgrid").innerHTML = `<div class="sk"></div><div class="sk"></div><div class="sk"></div>`;
-      try {
-        const [mv, sr] = await Promise.allSettled([catalog("movie", { search:q }), catalog("series", { search:q })]);
-        const raw = [
-          ...(mv.status === "fulfilled" ? mv.value.metas || [] : []),
-          ...(sr.status === "fulfilled" ? sr.value.metas || [] : []),
-        ];
-        const seen = new Set();
-        const items = raw.filter(x => x.poster && !seen.has(x.id) && seen.add(x.id));
-        $("#sgrid").innerHTML = items.map(x => card(x)).join("")
-          || `<div class="empty" style="grid-column:1/-1"><b>No matches</b>Try a different spelling.</div>`;
-      } catch {}
-    }, 420);
+      background:rgba(255,238,220,.05);color:var(--txt);font-size:15px;outline:none"></div>
+    <div class="grid" id="sgrid"></div><div class="morewrap" id="smore"></div>`);
+  const input = $("#sq"); input.focus();
+
+  const run = async () => {
+    const q = input.value.trim();
+    if (q.length < 2 || busy || done) return;
+    busy = true;
+    try {
+      const ex = ["search=" + encodeURIComponent(q)];
+      if (cursor) ex.push("skip=" + (cursor * 30));
+      const [mv, sr] = await Promise.allSettled([
+        getJSON(catUrl("movie", "top", ex), 1),
+        getJSON(catUrl("series", "top", ex), 1)
+      ]);
+      const raw = [...(mv.status === "fulfilled" ? mv.value.metas || [] : []),
+                   ...(sr.status === "fulfilled" ? sr.value.metas || [] : [])];
+      const fresh = raw.filter(x => x.poster && !seen.has(x.id));
+      fresh.forEach(x => seen.add(x.id));
+      if (!raw.length) done = true;
+      const g = $("#sgrid");
+      g.insertAdjacentHTML("beforeend", fresh.map(x => card(x)).join(""));
+      if (!g.children.length) g.innerHTML =
+        `<div class="empty" style="grid-column:1/-1"><b>No matches</b>Try a different spelling.</div>`;
+      cursor++;
+    } catch {}
+    busy = false;
+    const sm = $("#smore");
+    if (sm) sm.innerHTML = done ? "" : `<button class="btn sm" id="sMore">Load more</button>`;
+    const b = $("#sMore"); if (b) b.onclick = run;
   };
+
+  let t;
+  input.oninput = () => { clearTimeout(t); t = setTimeout(() => {
+    cursor = 0; seen = new Set(); done = false;
+    $("#sgrid").innerHTML = ""; run();
+  }, 420); };
+  input.onkeydown = e => { if (e.key === "Enter") run(); };
 }
 
-/* ═══════════ DETAIL ═══════════ */
-let modalId, modalType, season = 1, server = 0, curMeta = null, lastStreamUrl = "", autoTries = 0;
+/* ── detail ──────────────────────────────────────────────── */
+let modalId, modalType, season = 1, server = 0, curMeta = null, lastUrl = "", autoTries = 0;
 
 async function openDetail(id, type) {
   hidePreview();
-  modalId = id;
-  modalType = type;
-  server = 0;
-  autoTries = 0;
-  lastStreamUrl = "";
+  modalId = id; modalType = type; server = 0; autoTries = 0; lastUrl = "";
   SFX.whoosh(true);
   $("#modal").classList.add("on");
   $("#scrim").classList.add("on");
   $("#modal").setAttribute("aria-hidden", "false");
   $("#modal").innerHTML = `<div class="sheet"><div class="hero">
-    <span class="loadstate">loading…</span></div></div>`;
+    <div class="frame"></div><div class="body"><div class="loadstate">loading…</div></div></div></div>`;
 
   const seed = itemCache.get(id) || {};
   let m;
-  try { m = await metaOf(type, id); }
+  try { m = (await getJSON(`${CM}/meta/${type}/${id}.json`, 2)).meta || {}; }
   catch { m = { ...seed, id, type }; }
+  curMeta = m;
 
-  try {
-    curMeta = m;
-    const title = m.name || "Untitled";
-    const on = inList(m.id);
-    const t = (m.trailers || []).find(x => x.type === "Trailer") || (m.trailers || [])[0];
-    const videos = (m.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
-    const seasons = [...new Set(videos.map(v => v.season).filter(s => s > 0))].sort((a,b)=>a-b);
-    const p = pctOf(m);
-    const cont = contList().find(c => c.id === m.id);
-    const prog = cont ? progressOf(cont) : 0;
-    const resumeSeason = cont?.season ?? seasons[0] ?? 1;
-    const resumeEp = cont?.episode ?? 1;
-    const bg = m.background || seed.background || "";
+  const title = m.name || "Untitled", on = inList(m.id), p = pctOf(m);
+  const vids = (m.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
+  const seasons = [...new Set(vids.map(v => v.season).filter(s => s > 0))].sort((a,b) => a - b);
+  const cont = contList().find(c => c.id === m.id), prog = cont ? progressOf(cont) : 0;
+  const rS = cont?.season ?? seasons[0] ?? 1, rE = cont?.episode ?? 1;
+  const bg = m.background || seed.background || "";
+  const tr = (m.trailers || []).find(x => x.type === "Trailer") || (m.trailers || [])[0];
 
-    const usableNow = serversFor(m);
-    const remembered = store.get("rj_server", "");
-    const ri = usableNow.findIndex(x => x.name === remembered);
-    server = ri > 0 ? ri : 0;
+  const usableNow = serversFor(m), remembered = store.get("rj_server", "");
+  const ri = usableNow.findIndex(x => x.name === remembered);
+  server = ri > 0 ? ri : 0;
 
-    $("#modal").innerHTML = `<div class="sheet">
-      <div class="hero">
-        <button class="x" id="mx">✕</button>
-        ${bg ? `<img src="${esc(bg)}" alt="" referrerpolicy="no-referrer">` : ""}
-        <div class="fade"></div>
-        <div class="body">
-          ${m.logo ? `<img class="lg" src="${esc(m.logo)}" alt="${esc(title)}" referrerpolicy="no-referrer">` : `<h2>${esc(title)}</h2>`}
-          <div class="mrow">
-            ${p?`<span class="match">${p}% match</span>`:""}
-            <span>${esc(yearOf(m))}</span>
-            ${seasons.length?`<span>${seasons.length} season${seasons.length>1?"s":""}</span>`:""}
-            ${m.runtime?`<span>${esc(m.runtime)}</span>`:""}
-            <span class="tagline">HD</span>
-            ${prog >= 1 && prog < 97 ? `<span class="tagline resume" id="resumeLabel">${Math.round(100-prog)}% left</span>` : ""}
-          </div>
-          <div class="acts">
-            <button class="btn red" id="playBtn">▶ ${
-              prog >= 1 && prog < 97 ? `Resume${type==="series" ? ` S${resumeSeason} E${resumeEp}` : ""}` : "Play"}</button>
-            ${prog >= 1 ? `<button class="btn" id="restartBtn" title="Start over">↺ Restart</button>` : ""}
-            ${t?`<button class="btn" id="trBtn">🎬 Trailer</button>`:""}
-            <button class="btn" id="listBtn">${on?"✓ Saved":"+ My List"}</button>
-          </div>
+  $("#modal").innerHTML = `<div class="sheet">
+    <div class="hero">
+      <div class="frame">${bg ? `<img src="${esc(bg)}" alt="" referrerpolicy="no-referrer">` : ""}</div>
+      <button class="x" id="mx" title="Close">✕</button>
+      <div class="body">
+        ${m.logo ? `<img class="lg" src="${esc(m.logo)}" alt="" referrerpolicy="no-referrer">` : `<h2>${esc(title)}</h2>`}
+        <div class="mrow">${p?`<span class="match">${p}% match</span>`:""}<span>${esc(yearOf(m))}</span>
+          ${seasons.length?`<span>${seasons.length} season${seasons.length>1?"s":""}</span>`:""}
+          ${m.runtime?`<span>${esc(m.runtime)}</span>`:""}<span class="tagline">HD</span>
+          ${prog >= 1 && prog < 97 ? `<span class="tagline" id="resumeLabel">${Math.round(100-prog)}% left</span>` : ""}</div>
+        <div class="acts">
+          <button class="btn red" id="playBtn">▶ ${prog >= 1 && prog < 97 ? "Resume" : "Play"}</button>
+          ${tr ? `<button class="btn" id="trBtn">🎬 Trailer</button>` : ""}
+          <button class="btn" id="listBtn">${on ? "✓ Saved" : "+ My List"}</button>
         </div>
       </div>
+    </div>
+    <div id="playerBox"></div>
+    <div class="tabs" id="tabs"><button class="on" data-tab="ov">Overview</button>
+      ${seasons.length?`<button data-tab="ep">Episodes</button>`:""}
+      <button data-tab="dl">Download</button></div>
+    <div id="tab-ov" class="pad">
+      <p class="ov">${esc(m.description || "No synopsis available.")}</p>
+      ${m.genres?.length?`<p class="kv">Genres <b>${m.genres.map(esc).join(", ")}</b></p>`:""}
+      ${m.director?.length?`<p class="kv">Director <b>${m.director.map(esc).join(", ")}</b></p>`:""}
+      ${m.cast?.length?`<div class="cast">${m.cast.slice(0,12).map(c => `<div><div class="av">${
+        esc((c[0]||"?").toUpperCase())}</div><p>${esc(c)}</p></div>`).join("")}</div>`:""}
+    </div>
+    ${seasons.length?`<div id="tab-ep" class="hide"><div class="seasons"><select id="selS">${
+      seasons.map(s => `<option value="${s}" ${s === rS ? "selected" : ""}>Season ${s}</option>`).join("")}</select></div>
+      <div class="eps" id="eps"></div></div>`:""}
+    <div id="tab-dl" class="hide pad"><p class="kv">Torrent releases from public indexes.</p><div id="dl"></div></div>
+  </div>`;
 
-      <div id="playerBox"></div>
-
-      <div class="tabs" id="tabs">
-        <button class="on" data-tab="ov">Overview</button>
-        ${seasons.length?`<button data-tab="ep">Episodes</button>`:""}
-        <button data-tab="dl">Download</button>
-      </div>
-
-      <div id="tab-ov" class="pad">
-        <p class="ov">${esc(m.description || "No synopsis available.")}</p>
-        ${m.awards?`<p class="kv">${esc(m.awards)}</p>`:""}
-        ${m.genres?.length?`<p class="kv">Genres <b>${m.genres.map(esc).join(", ")}</b></p>`:""}
-        ${m.director?.length?`<p class="kv">Director <b>${m.director.map(esc).join(", ")}</b></p>`:""}
-        ${m.country?`<p class="kv">Country <b>${esc(m.country)}</b></p>`:""}
-        ${m.cast?.length?`<div class="cast">${m.cast.slice(0,12).map(c=>`<div>
-          <div class="av">${esc((c[0]||"?").toUpperCase())}</div><p>${esc(c)}</p></div>`).join("")}</div>`:""}
-      </div>
-      ${seasons.length?`<div id="tab-ep" class="hide">
-        <div class="seasons"><select id="selS">${
-          seasons.map(s=>`<option value="${s}" ${s===resumeSeason?"selected":""}>Season ${s}</option>`).join("")}</select></div>
-        <div class="eps" id="eps"></div></div>`:""}
-      <div id="tab-dl" class="hide pad"><p class="kv">Torrent releases from public indexes.</p><div id="dl"></div></div>
-    </div>`;
-
-    $("#mx").onclick = closeDetail;
-    $("#listBtn").onclick = () => toggleList({ id:m.id, type, name:title, poster:m.poster,
-      releaseInfo:yearOf(m), imdbRating:m.imdbRating }, $("#listBtn"));
-    $("#playBtn").onclick = () => play(type === "series" ? resumeSeason : null, type === "series" ? resumeEp : null);
-    $("#restartBtn")?.addEventListener("click", () => {
-      saveCont(contList().filter(c => c.id !== m.id));
-      renderContinue();
-      play(type === "series" ? seasons[0] ?? 1 : null, 1);
-      $("#resumeLabel")?.remove();
-    });
-    $("#trBtn")?.addEventListener("click", () => {
-      $("#playerBox").innerHTML = `<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/${t.source}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="origin"></iframe></div>`;
-    });
-
-    $("#tabs").onclick = e => {
-      const b = isEl(e.target) ? e.target.closest("button") : null;
-      if (!b) return;
-      $$("#tabs button").forEach(x => x.classList.toggle("on", x === b));
-      $$("#tab-ov,#tab-ep,#tab-dl").forEach(x => x.classList.add("hide"));
-      $("#tab-" + b.dataset.tab)?.classList.remove("hide");
-      if (b.dataset.tab === "ep" && !$("#eps").children.length) drawSeason(resumeSeason);
-      if (b.dataset.tab === "dl" && !$("#dl").children.length) loadTorrents(title, m.id);
-    };
-    $("#selS")?.addEventListener("change", e => drawSeason(+e.target.value));
-    if (seasons.length) drawSeason(resumeSeason);
-  } catch {
-    $("#modal").innerHTML = `<div class="sheet"><div class="pad">
-      <h2 style="margin-bottom:10px">Could not load</h2>
-      <p class="kv">The catalog server didn't answer. Retry in a moment.</p>
-      <button class="btn sm red" id="mx2">Close</button></div></div>`;
-    $("#mx2").onclick = closeDetail;
-  }
+  $("#mx").onclick = closeDetail;
+  $("#listBtn").onclick = () => toggleList({ id:m.id, type, name:title, poster:m.poster,
+    releaseInfo:yearOf(m), imdbRating:m.imdbRating }, $("#listBtn"));
+  $("#playBtn").onclick = () => play(type === "series" ? rS : null, type === "series" ? rE : null);
+  $("#trBtn")?.addEventListener("click", () => {
+    $("#playerBox").innerHTML = `<div class="player"><iframe
+      src="https://www.youtube-nocookie.com/embed/${tr.source}?autoplay=1&rel=0"
+      allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="origin"></iframe></div>`;
+  });
+  $("#tabs").onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $$("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+    $$("#tab-ov,#tab-ep,#tab-dl").forEach(x => x.classList.add("hide"));
+    $("#tab-" + b.dataset.tab)?.classList.remove("hide");
+    if (b.dataset.tab === "ep" && !$("#eps").children.length) drawSeason(rS);
+    if (b.dataset.tab === "dl" && !$("#dl").children.length) loadTorrents(title, m.id);
+  };
+  $("#selS")?.addEventListener("change", e => drawSeason(+e.target.value));
+  if (seasons.length) drawSeason(rS);
 }
 
 function drawSeason(n) {
   season = n;
-  const videos = curMeta?.videos || [];
-  const eps = videos.filter(v => v.season === n).sort((a,b) => a.episode - b.episode);
-  const cont = contList().find(c => c.id === modalId);
-  const host = $("#eps");
-  if (!host) return;
-  host.innerHTML = eps.map(ep => {
-    const isNow = cont && cont.season === n && cont.episode === ep.episode;
-    const p = isNow ? progressOf(cont) : 0;
-    return `<button class="ep ${isNow ? "now" : ""}" data-e="${ep.episode}">
-      ${ep.thumbnail?`<img class="th" loading="lazy" src="${esc(ep.thumbnail)}" alt=""
-        referrerpolicy="no-referrer" onerror="this.style.display='none'">`:""}
-      <span><span class="n">E${ep.episode}</span> <span class="et">${esc(ep.name||"")}
-        <small>${esc((ep.firstAired||"").slice(0,10))}</small></span></span>
-      ${p ? `<span class="bar"><i style="width:${p.toFixed(1)}%"></i></span>` : ""}</button>`;
-  }).join("") || `<p class="kv">No episodes listed.</p>`;
-  host.onclick = e => {
-    const b = isEl(e.target) ? e.target.closest("[data-e]") : null;
-    if (b) play(season, +b.dataset.e);
-  };
+  const eps = (curMeta?.videos || []).filter(v => v.season === n).sort((a,b) => a.episode - b.episode);
+  const cont = contList().find(c => c.id === modalId), h = $("#eps"); if (!h) return;
+  h.innerHTML = eps.map(ep => `<button class="ep ${cont && cont.season === n && cont.episode === ep.episode ? "now" : ""}"
+    data-e="${ep.episode}">
+    ${ep.thumbnail ? `<img class="th" loading="lazy" src="${esc(ep.thumbnail)}" alt="" referrerpolicy="no-referrer"
+      onerror="this.style.display='none'">` : ""}
+    <span><span class="n">E${ep.episode}</span> <span class="et">${esc(ep.name || "")}
+      <small>${esc((ep.firstAired || "").slice(0,10))}</small></span></span></button>`).join("")
+    || `<p class="kv">No episodes listed.</p>`;
+  h.onclick = e => { const b = e.target.closest("[data-e]"); if (b) play(season, +b.dataset.e); };
 }
 
-function serversFor(meta) {
-  const tmdb = meta?.moviedb_id;
-  return SERVERS.filter(s => s.kind === "imdb" || tmdb);
-}
-
+function serversFor(meta) { return SERVERS.filter(s => s.kind === "imdb" || meta?.moviedb_id); }
 function streamUrl(srv, s, e) {
   const id = srv.kind === "tmdb" ? curMeta?.moviedb_id : modalId;
   if (!id) return "";
-  return modalType === "series"
-    ? srv.t(id, Math.max(1, s ?? 1), Math.max(1, e ?? 1))
-    : srv.m(id);
+  return modalType === "series" ? srv.t(id, Math.max(1, s ?? 1), Math.max(1, e ?? 1)) : srv.m(id);
 }
 
 function play(s, e, auto = false) {
   if (!curMeta) return;
-  const box = $("#playerBox");
-  if (!box) return;
-
+  const box = $("#playerBox"); if (!box) return;
   if (!auto) autoTries = 0;
-
   const usable = serversFor(curMeta);
-  if (!usable.length) { toast("No playable source", "err"); return; }
+  if (!usable.length) return toast("No playable source", "err");
   if (server >= usable.length || server < 0) server = 0;
-
   let srv = null, url = "";
   for (let i = 0; i < usable.length; i++) {
-    const cand = usable[(server + i) % usable.length];
-    const u = streamUrl(cand, s, e);
+    const cand = usable[(server + i) % usable.length], u = streamUrl(cand, s, e);
     if (u) { srv = cand; url = u; server = usable.indexOf(cand); break; }
   }
-  if (!srv || !url) { toast("No playable source", "err"); return; }
-
-  lastStreamUrl = url;
+  if (!url) return toast("No playable source", "err");
+  lastUrl = url;
   if (!auto) store.set("rj_server", srv.name);
 
-  box.innerHTML = `<div class="servers" id="srvRow"><span>Server</span>${
-    usable.map((x,i)=>`<button class="${i===server?"on":""}" data-s="${i}">${esc(x.name)}</button>`).join("")}</div>
-    <div class="player">
-      <iframe id="streamFrame"
-        src="${esc(url)}"
-        title="player"
-        allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; gyroscope"
-        allowfullscreen webkitallowfullscreen mozallowfullscreen
-        referrerpolicy="origin"
-        frameborder="0"></iframe>
-      <div class="boot" id="bootNote">Connecting to ${esc(srv.name)}…</div>
-    </div>
-    <div class="pfoot">
-      <span>Blank or stuck? Try another server, or open it in a new tab.</span>
-      <button id="nextSrv">Next server</button>
-      <button id="openTab">Open in new tab</button>
-    </div>`;
+  box.innerHTML = `<div class="servers" id="srvRow"><span class="lab">Server</span>${
+    usable.map((x,i) => `<button class="${i === server ? "on" : ""}" data-s="${i}">${esc(x.name)}</button>`).join("")}</div>
+    <div class="player"><iframe id="streamFrame" src="${esc(url)}" title="player"
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen
+      webkitallowfullscreen mozallowfullscreen referrerpolicy="origin" frameborder="0"></iframe>
+      <div class="boot" id="bootNote">Connecting to ${esc(srv.name)}…</div></div>
+    <div class="pfoot"><span>Blank or stuck? Try another server, or open it in a new tab.</span>
+      <button id="nextSrv">Next server</button><button id="openTab">Open in new tab</button></div>`;
 
-  const frame = $("#streamFrame");
-  const note = $("#bootNote");
+  const frame = $("#streamFrame"), note = $("#bootNote");
   let settled = false;
-
-  const watchdog = setTimeout(() => {
+  const wd = setTimeout(() => {
     if (settled || !document.body.contains(frame)) return;
     if (autoTries < usable.length - 1) {
       autoTries++;
-      if (note) note.textContent = `${srv.name} isn't responding — trying another server…`;
       server = (server + 1) % usable.length;
+      if (note) note.textContent = "That server isn't answering — trying another…";
       play(s, e, true);
-    } else if (note) {
-      note.textContent = "Nothing loaded here. Use Open in new tab.";
-    }
+    } else if (note) note.textContent = "Nothing loaded. Use Open in new tab.";
   }, 11000);
+  frame.addEventListener("load", () => { settled = true; clearTimeout(wd); note?.remove(); }, { once:true });
 
-  frame.addEventListener("load", () => {
-    settled = true;
-    clearTimeout(watchdog);
-    note?.remove();
-  }, { once:true });
-
-  $("#srvRow").onclick = ev => {
-    const b = isEl(ev.target) ? ev.target.closest("button") : null;
-    if (!b) return;
-    server = +b.dataset.s;
-    play(s, e);
-  };
-  $("#nextSrv").onclick = () => {
-    server = (server + 1) % usable.length;
-    play(s, e);
-  };
-  $("#openTab").onclick = () => {
-    if (!lastStreamUrl) return;
-    window.open(lastStreamUrl, "_blank", "noopener,noreferrer");
-  };
+  $("#srvRow").onclick = ev => { const b = ev.target.closest("button"); if (b) { server = +b.dataset.s; play(s, e); } };
+  $("#nextSrv").onclick = () => { server = (server + 1) % usable.length; play(s, e); };
+  $("#openTab").onclick = () => { if (lastUrl) window.open(lastUrl, "_blank", "noopener,noreferrer"); };
 
   box.scrollIntoView({ behavior:"smooth", block:"start" });
-
-  const vids = (curMeta.videos || []).slice().sort((a,b) => (a.season - b.season) || (a.episode - b.episode));
   const idx = modalType === "series"
-    ? Math.max(0, vids.findIndex(v => v.season === (s ?? 1) && v.episode === (e ?? 1))) : 0;
+    ? Math.max(0, (curMeta.videos || []).findIndex(v => v.season === (s ?? 1) && v.episode === (e ?? 1))) : 0;
   upsertCont({ ...curMeta, type:modalType }, s ?? null, e ?? null, idx);
   currentId = curMeta.id;
   $$(".ep").forEach(el => el.classList.toggle("now", +el.dataset.e === e));
 }
 
-/* players that report a dead title can trigger an immediate server hop */
+/* a player reporting a dead title hops immediately */
 addEventListener("message", ev => {
   const d = ev.data;
   if (!d || typeof d !== "object" || d.type !== "MEDIA_NOT_FOUND") return;
   const box = $("#playerBox");
-  if (!box || !box.querySelector("#streamFrame")) return;
+  if (!box || !box.querySelector("#streamFrame") || !curMeta) return;
   const usable = serversFor(curMeta);
   if (!usable.length || autoTries >= usable.length - 1) return;
   autoTries++;
@@ -1355,14 +1121,12 @@ addEventListener("message", ev => {
 });
 
 async function loadTorrents(title, imdb) {
-  const host = $("#dl");
-  if (!host) return;
+  const host = $("#dl"); if (!host) return;
   host.innerHTML = `<p class="kv">scraping…</p>`;
-  const cat = modalType === "series" ? "205" : "207";
-  const list = [];
+  const cat = modalType === "series" ? "205" : "207", list = [];
   const [bay, yts] = await Promise.allSettled([
     getJSON(`${APIBAY}/q.php?q=${encodeURIComponent(title)}&cat=${cat}`, 1),
-    getJSON(`${YTS}?limit=30&sort_by=seeds&order_by=desc&query_term=${encodeURIComponent(imdb)}`, 1),
+    getJSON(`${YTS}?limit=30&sort_by=seeds&order_by=desc&query_term=${encodeURIComponent(imdb)}`, 1)
   ]);
   if (bay.status === "fulfilled" && Array.isArray(bay.value))
     for (const x of bay.value) {
@@ -1376,14 +1140,13 @@ async function loadTorrents(title, imdb) {
   const rows = list.filter(x => x.hash && !seen.has(x.hash) && seen.add(x.hash))
     .sort((a,b) => b.seeds - a.seeds).slice(0, 40);
   host.innerHTML = rows.length
-    ? rows.map(r=>`<div class="trow"><span class="q">${esc(r.q||"—")}</span>
+    ? rows.map(r => `<div class="trow"><span class="q">${esc(r.q || "—")}</span>
         <span class="sz">${esc(bytes(r.size))} · ${esc(r.name.slice(0,58))}</span>
         <span class="sd">▲ ${r.seeds}</span>
-        <button data-m="${esc(magnet(r.hash,r.name))}">Magnet</button></div>`).join("")
+        <button data-m="${esc(magnet(r.hash, r.name))}">Magnet</button></div>`).join("")
     : `<p class="kv">No releases found. Try a different title.</p>`;
   host.onclick = e => {
-    const b = isEl(e.target) ? e.target.closest("[data-m]") : null;
-    if (!b) return;
+    const b = e.target.closest("[data-m]"); if (!b) return;
     navigator.clipboard?.writeText(b.dataset.m)
       .then(() => toast("Magnet copied", "ok"))
       .catch(() => toast("Copy blocked", "err"));
@@ -1391,9 +1154,8 @@ async function loadTorrents(title, imdb) {
 }
 
 function toggleList(o, btn) {
-  const l = myList();
-  const i = l.findIndex(x => x.id === o.id);
-  i > -1 ? l.splice(i,1) : l.push(o);
+  const l = myList(), i = l.findIndex(x => x.id === o.id);
+  i > -1 ? l.splice(i, 1) : l.push(o);
   store.set("rj_list", l);
   $$(`[data-fav="${o.id}"]`).forEach(b => b.classList.toggle("on", i === -1));
   if (btn) btn.textContent = i === -1 ? "✓ Saved" : "+ My List";
@@ -1408,60 +1170,47 @@ function closeDetail() {
   $("#scrim").classList.remove("on");
   $("#modal").innerHTML = "";
   $("#modal").setAttribute("aria-hidden", "true");
-  curMeta = null;
-  currentId = null;
-  lastStreamUrl = "";
-  autoTries = 0;
+  curMeta = null; currentId = null; lastUrl = ""; autoTries = 0;
   renderContinue();
 }
 
-/* ═══════════ EFFECTS ═══════════ */
+/* ── events ──────────────────────────────────────────────── */
 function ripple(el, ev) {
   if (!el) return;
-  const r = el.getBoundingClientRect();
-  const s = Math.max(r.width, r.height);
-  const span = document.createElement("span");
-  span.className = "ripple";
-  span.style.width = span.style.height = s + "px";
-  span.style.left = (ev.clientX - r.left) + "px";
-  span.style.top = (ev.clientY - r.top) + "px";
-  el.appendChild(span);
-  setTimeout(() => span.remove(), 600);
+  const r = el.getBoundingClientRect(), s = Math.max(r.width, r.height);
+  const sp = document.createElement("span");
+  sp.className = "ripple";
+  sp.style.width = sp.style.height = s + "px";
+  sp.style.left = (ev.clientX - r.left) + "px";
+  sp.style.top = (ev.clientY - r.top) + "px";
+  el.appendChild(sp);
+  setTimeout(() => sp.remove(), 600);
 }
 
-/* a response for every single pointer-down, wherever it lands */
-const CONTROL = ".btn, .iconbtn, .chips button, .tabs button, .servers button, .pfoot button, " +
-  ".trow button, .rowfail button, .ep, .card, .fav, .kill, .x, .links button, input, select, #sndBtn";
-const RIPPLE_AT = ".btn, .chips button, .servers button, .pfoot button, .trow button, .rowfail button";
-
-document.addEventListener("pointerdown", e => {
-  if (!isEl(e.target)) return;
-  const t = e.target.closest(CONTROL);
-  if (t) ripple(t.closest(RIPPLE_AT), e);
+document.addEventListener("pointerdown", ev => {
+  if (!isEl(ev.target)) return;
+  const t = ev.target.closest(".btn,.chips button,.servers button,.pfoot button,.ep,.card,.iconbtn,.links button");
+  if (t) ripple(t.closest(".btn,.chips button,.servers button,.pfoot button"), ev);
   t ? SFX.press() : SFX.tap();
 }, true);
 
 document.addEventListener("keydown", e => {
   const tag = document.activeElement?.tagName;
-  const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
-  if (typing || e.key.length === 1 || e.key === "Backspace" || e.key === "Enter") SFX.key();
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.key.length === 1 || e.key === "Backspace")
+    SFX.key();
 });
 
-/* ═══════════ EVENTS ═══════════ */
 document.addEventListener("click", e => {
   if (!isEl(e.target)) return;
 
   const kill = e.target.closest("[data-kill]");
-  if (kill) { e.stopPropagation(); removeCont(kill.dataset.kill); return; }
+  if (kill) { e.stopPropagation(); saveCont(contList().filter(c => c.id !== kill.dataset.kill)); renderContinue(); toast("Removed"); return; }
 
   const retry = e.target.closest("[data-retry]");
   if (retry) {
-    const id = retry.dataset.retry;
-    const el = document.getElementById(id);
-    if (!el) return;
-    const steps = JSON.parse(el.dataset.steps || '[{}]');
-    el.innerHTML = Array.from({length:8},()=>'<div class="sk"></div>').join("");
-    fillRow(id, retry.dataset.type, steps);
+    const el = document.getElementById(retry.dataset.retry); if (!el) return;
+    el.innerHTML = '<div class="sk"></div>'.repeat(8);
+    fillRow(retry.dataset.retry, retry.dataset.type, JSON.parse(el.dataset.steps || "[{}]"));
     return;
   }
 
@@ -1469,12 +1218,9 @@ document.addEventListener("click", e => {
   if (fav && !fav.closest("#modal")) {
     e.stopPropagation();
     const el = fav.closest(".card");
-    toggleList({
-      id: fav.dataset.fav,
-      type: el.dataset.type,
-      name: el.querySelector(".t")?.textContent || el.querySelector(".cap")?.textContent || "",
-      poster: el.querySelector("img")?.getAttribute("src") || "",
-    }, null);
+    toggleList({ id:fav.dataset.fav, type:el.dataset.type,
+      name:el.querySelector(".t")?.textContent || el.querySelector(".cap")?.textContent || "",
+      poster:el.querySelector("img")?.getAttribute("src") || "" }, null);
     return;
   }
   const pl = e.target.closest("[data-play]");
@@ -1490,27 +1236,22 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(
 addEventListener("scroll", () => $("#nav").classList.toggle("solid", scrollY > 40));
 
 $("#navLinks").onclick = e => {
-  const b = isEl(e.target) ? e.target.closest("button") : null;
-  if (!b) return;
+  const b = e.target.closest("button"); if (!b) return;
   $$("#navLinks button").forEach(x => x.classList.toggle("on", x === b));
   const p = b.dataset.page;
-  hidePreview();
-  SFX.whoosh(true);
+  hidePreview(); SFX.whoosh(true);
   scrollTo({ top:0, behavior:"smooth" });
   if (p === "home") renderHome();
   else if (p === "list") renderList();
   else renderBrowse(p === "movies" ? "movie" : "series");
 };
-$("#searchBtn").onclick = () => renderSearch();
+$("#searchBtn").onclick = renderSearch;
 
-/* sound controls */
-const sndBtn = $("#sndBtn");
-const volInput = $("#vol");
+const sndBtn = $("#sndBtn"), volInput = $("#vol");
 function syncSnd() {
   if (!sndBtn) return;
   sndBtn.classList.toggle("off", SFX.muted);
   sndBtn.textContent = SFX.muted ? "🔇" : "♪";
-  sndBtn.title = SFX.muted ? "Sound off" : "Sound on";
 }
 if (sndBtn) {
   syncSnd();
@@ -1518,29 +1259,18 @@ if (sndBtn) {
   sndBtn.oncontextmenu = e => { e.preventDefault(); $("#volpop")?.classList.toggle("on"); };
 }
 if (volInput) {
-  volInput.value = Math.round(SFX.vol * 100);
+  volInput.value = Math.round((SFX.vol || 0.6) * 100);
   volInput.oninput = e => SFX.setVol(+e.target.value / 100);
-  volInput.onchange = () => SFX.tap();
 }
 document.addEventListener("click", e => {
   if (!isEl(e.target)) return;
   if (!e.target.closest("#volpop") && !e.target.closest("#sndBtn")) $("#volpop")?.classList.remove("on");
 });
 
-/* ═══════════ BOOT ═══════════ */
-addEventListener("error", ev => {
-  if (ev.error) console.error("[reeljack]", ev.error);
-});
+/* ── boot ────────────────────────────────────────────────── */
 addEventListener("unhandledrejection", ev => console.error("[reeljack]", ev.reason));
-
-try {
-  renderHome();
-} catch (err) {
-  console.error("[reeljack] boot failed", err);
-  const main = $("#main");
-  if (main) main.innerHTML = `<div class="empty"><b>Something broke on load</b>
-    ${esc(err.message || err)}
-    <div style="margin-top:14px"><button class="btn sm" onclick="location.reload()">Reload</button></div></div>`;
+try { renderHome(); } catch (err) {
+  $("#main").innerHTML = `<div class="empty"><b>Something broke</b>${esc(err.message || err)}</div>`;
 }
 })();
 </script>
