@@ -469,14 +469,12 @@ const GENRES = ["Action","Adventure","Animation","Biography","Comedy","Crime","D
 const DECADES = ["2020s","2010s","2000s","1990s","1980s","1970s","1960s","1950s","1940s","1930s"];
 const Y = new Date().getFullYear();
 
-/* genre → Wikidata P136 label */
 const WD_GENRE = { Action:"action film", Adventure:"adventure film", Animation:"animated film",
   Biography:"biographical film", Comedy:"comedy film", Crime:"crime film", Documentary:"documentary film",
   Drama:"drama film", Family:"family film", Fantasy:"fantasy film", History:"historical film",
   Horror:"horror film", Mystery:"mystery film", Romance:"romance film", "Sci-Fi":"science fiction film",
   Sport:"sports film", Thriller:"thriller film", War:"war film", Western:"western film" };
 
-/* genre → iTunes RSS genre id */
 const IT_GENRE = { Action:4401, Adventure:4401, Animation:4402, Biography:4406, Comedy:4404,
   Crime:4406, Documentary:4405, Drama:4406, Family:4407, Fantasy:4412, History:4405, Horror:4408,
   Mystery:4415, Romance:4411, "Sci-Fi":4412, Sport:4416, Thriller:4415, War:4406, Western:4417 };
@@ -832,8 +830,9 @@ function addItem(type, raw, isLive) {
   seen.add(id);
   const item = {
     id, type, name: clean(raw.name) || "Untitled",
-    year: raw.year || 0, rating: raw.rating || 0,
-    genres: raw.genres || [], runtime: raw.runtime || "",
+    year: +raw.year || 0, rating: +raw.rating || 0,
+    genres: Array.isArray(raw.genres) ? raw.genres.filter(Boolean) : [],
+    runtime: raw.runtime || "",
     desc: clean(raw.desc || ""),
     poster: raw.poster || (/^tt\d+$/.test(id) ? post(id) : ""),
     backdrop: raw.backdrop || (/^tt\d+$/.test(id) ? back(id) : ""),
@@ -868,9 +867,10 @@ function hydrate() {
   (d.series || []).forEach(x => addItem("series", x, true));
 }
 
+/* genres are always arrays — guard anyway */
 function filtered(type, f) {
   let out = lib[type];
-  if (f.genre) out = out.filter(x => x.genres.includes(f.genre));
+  if (f.genre) out = out.filter(x => Array.isArray(x.genres) && x.genres.includes(f.genre));
   if (f.decade) { const s = +f.decade.slice(0,4); out = out.filter(x => x.year >= s && x.year <= s + 9); }
   if (f.sort === "rated") out = [...out].sort((a,b) => b.rating - a.rating);
   else if (f.sort === "newest" || f.decade) out = [...out].sort((a,b) => b.year - a.year || b.rating - a.rating);
@@ -898,7 +898,7 @@ async function ytsCall(params) {
 }
 const ytsItem = m => m?.id && {
   id: m.imdb_code && /^tt\d+$/.test(m.imdb_code) ? m.imdb_code : "",
-  imdb: m.imdb_code || "", name: m.title_long || m.title,
+  imdb: m.imdb_code || "", name: m.title_long || m.title, type:"movie",
   year:+(m.year||0), rating:+(m.rating||0), genres: m.genres || [],
   runtime: m.runtime ? m.runtime + " min" : "", desc: m.summary || m.description_full || "",
   poster: m.large_cover_image || m.medium_cover_image || "",
@@ -936,9 +936,10 @@ function bayItem(x) {
   const { name, year } = bayTitle(x.name);
   if (!name || name.length < 2) return null;
   const imdb = x.imdb && /^tt\d+$/.test(x.imdb) ? x.imdb : "";
-  const tv = x.category >= 203 && x.category <= 205;
+  const isTv = x.category >= 203 && x.category <= 205;
   return {
     id: imdb || "bay" + x.info_hash, imdb, name, year,
+    type: isTv ? "series" : "movie",
     rating: 0, genres: [], desc: "", src:"bay",
     poster: imdb ? post(imdb) : "", backdrop: imdb ? back(imdb) : "",
     torrents: [{ q:(x.name.match(/2160p|1080p|720p|480p/i)||["—"])[0], s:+x.size, h:x.info_hash, seeds:+x.seeders }]
@@ -952,17 +953,14 @@ async function bayPage(f, page) {
     const d = await req(`${BAY[0]}/precompiled/data_top100_${cat}.json`);
     return (Array.isArray(d) ? d : []).map(bayItem).filter(Boolean);
   }
-  /* deeper: search by rotating year */
   const year = Y - ((page - cats.length) % 40);
   const d = await req(`${BAY[0]}/q.php?q=${year}&cat=${cat}`);
   return (Array.isArray(d) ? d : []).map(bayItem).filter(Boolean);
 }
 async function baySearch(q, page) {
-  const d = await req(`${BAY[0]}/q.php?q=${encodeURIComponent(q)}&cat=207`);
-  const out = (Array.isArray(d) ? d : []).map(bayItem).filter(Boolean);
-  if (page === 1) return out;
-  const d2 = await req(`${BAY[0]}/q.php?q=${encodeURIComponent(q)}&cat=205`);
-  return (Array.isArray(d2) ? d2 : []).map(bayItem).filter(Boolean);
+  const cat = page > 1 ? 205 : 207;
+  const d = await req(`${BAY[0]}/q.php?q=${encodeURIComponent(q)}&cat=${cat}`);
+  return (Array.isArray(d) ? d : []).map(bayItem).filter(Boolean);
 }
 
 /* 3 · Wikidata — deep, has IMDb ids and free images */
@@ -991,7 +989,7 @@ function wdItem(b, kind) {
   }
   return {
     id: imdb, imdb, name: b.fLabel?.value, year:+(b.year?.value||0),
-    rating: 0, genres: f0 => [], desc: "", src:"wd",
+    type: kind, rating: 0, genres: [], desc: "", src:"wd",
     poster, backdrop: poster ? poster.replace("width=480", "width=1280") : ""
   };
 }
@@ -1001,7 +999,6 @@ async function wdPage(f, page) {
   const d = await req(`${WD}?format=json&query=${encodeURIComponent(wdQuery(kind, f, off))}`, 36e5);
   const rows = d?.results?.bindings || [];
   const out = rows.map(b => wdItem(b, kind)).filter(Boolean);
-  /* keep genre honest for movies */
   if (f.genre) out.forEach(o => { if (o && !o.genres.length) o.genres = [f.genre]; });
   return out;
 }
@@ -1020,7 +1017,7 @@ const itItem = e => {
   if (!e) return null;
   const name = e["im:name"]?.label;
   if (!name) return null;
-  const imgs = e["im:image"] || [];
+  const imgs = Array.isArray(e["im:image"]) ? e["im:image"] : e["im:image"] ? [e["im:image"]] : [];
   const raw = imgs[imgs.length - 1]?.label || "";
   const poster = raw.replace(/\/\d+x\d+bb\.(png|jpg|jpeg)$/i, "/600x900bb.png");
   const year = +(e["im:releaseDate"]?.attributes?.label?.slice(-4) || 0) || 0;
@@ -1028,7 +1025,7 @@ const itItem = e => {
   const g = GENRES.find(x => term.toLowerCase().includes(x.toLowerCase().split("-")[0]));
   const secs = parseInt(e["im:duration"]?.label || 0, 10) / 1000;
   return {
-    id: "it" + (e.id?.attributes?.["im:id"] || norm(name)), name, year,
+    id: "it" + (e.id?.attributes?.["im:id"] || norm(name)), name, year, type:"movie",
     rating: 0, genres: g ? [g] : [], desc: e.summary?.label || "",
     runtime: secs > 300 ? Math.round(secs / 60) + " min" : "",
     poster, backdrop: poster.replace("/600x900bb.png", "/1200x675bb.png"), src:"it"
@@ -1046,7 +1043,7 @@ async function itPage(f, page) {
 /* 5 · TVMaze — series with IMDb ids */
 const tvItem = s => s?.id && {
   id: s.externals?.imdb && /^tt\d+$/.test(s.externals.imdb) ? s.externals.imdb : "",
-  imdb: s.externals?.imdb || "", tv: s.id, name: s.name,
+  imdb: s.externals?.imdb || "", tv: s.id, name: s.name, type:"series",
   year: s.premiered ? +s.premiered.slice(0,4) : 0, rating: s.rating?.average || 0,
   genres: s.genres || [], desc: s.summary || "",
   runtime: s.averageRuntime ? s.averageRuntime + " min" : "",
@@ -1067,6 +1064,7 @@ async function tvSearch(q) {
 /* 6 · Jikan — anime films & series */
 const jkItem = a => a?.mal_id && {
   id: "mal" + a.mal_id, name: a.title_english || a.title,
+  type: a.type === "TV" || a.type === "ONA" ? "series" : "movie",
   year: a.year || (a.aired?.from ? +a.aired.from.slice(0,4) : 0),
   rating: a.score || 0, genres: (a.genres || []).map(g => g.name)
     .map(g => GENRES.find(x => x.toLowerCase() === g.toLowerCase())).filter(Boolean),
@@ -1098,12 +1096,13 @@ const ADAPTERS = [
 
 const offSet = () => new Set(store.get("n_off", []));
 
-/* per-filter cursors */
+/* per-filter cursors — `got` counts LIVE items only, so the seed shelf
+   never makes us skip fetching */
 const cur = new Map();
 const fkey = (type, f) => `${type}|${f.sort || "popular"}|${f.genre || ""}|${f.decade || ""}`;
 function cursor(k) {
   let c = cur.get(k);
-  if (!c) { c = { rot:0, page:1, busy:false, done:false, fails:0, dead:new Set() }; cur.set(k, c); }
+  if (!c) { c = { rot:0, got:0, pages:{}, busy:false, done:false, dead:new Set() }; cur.set(k, c); }
   return c;
 }
 
@@ -1113,25 +1112,28 @@ const adCool = id => (AD_FAIL.get(id) || 0) > Date.now();
 async function pull(type, f, want) {
   const k = fkey(type, f), st = cursor(k);
   if (st.busy || st.done) return false;
-  if (filtered(type, f).length >= want) return false;
+  if (st.got >= want) return false;
   st.busy = true;
+  let added = 0;
   try {
     const pool = ADAPTERS.filter(a => (a.kind === type || a.kind === "both") && !st.dead.has(a.id));
     if (!pool.length) { st.done = true; return false; }
-    for (let i = 0; i < pool.length; i++) {
+    for (let i = 0; i < pool.length && added === 0; i++) {
       const a = pool[(st.rot + i) % pool.length];
       if (adCool(a.id)) continue;
+      const pg = st.pages[a.id] || 1;
       try {
-        const rows = await a.page({ ...f, type }, st.page);
+        const rows = await a.page({ ...f, type }, pg);
         st.rot = (st.rot + i + 1) % pool.length;
         if (!rows.length) { st.dead.add(a.id); continue; }
-        let added = 0;
+        st.pages[a.id] = pg + 1;
         for (const r of rows) if (addItem(type, r, true)) added++;
-        if (added) { st.page++; AD_FAIL.delete(a.id); return true; }
+        if (added) { st.got += added; AD_FAIL.delete(a.id); }
+        else if (pg > 25) st.dead.add(a.id);
       } catch { AD_FAIL.set(a.id, Date.now() + 60000); }
     }
-    st.done = true;
-    return false;
+    if (!added && !pool.some(a => !st.dead.has(a.id) && !adCool(a.id))) st.done = true;
+    return added > 0;
   } finally { st.busy = false; }
 }
 
@@ -1169,7 +1171,7 @@ async function warm() {
   const jobs = [["movie",{sort:"popular"}],["series",{sort:"popular"}],
                 ["movie",{sort:"rated"}],["series",{sort:"rated"}],
                 ["movie",{sort:"newest"}],["series",{sort:"newest"}]];
-  for (const [t, f] of jobs) await pull(t, f, 26);
+  for (const [t, f] of jobs) await pull(t, f, 30);
   $$("[data-row]").forEach(el => {
     if (el.dataset.done === "1") return;
     fillRow(el, el.dataset.rtype, JSON.parse(el.dataset.f || "{}"));
@@ -1288,10 +1290,9 @@ async function fillRow(el, type, f) {
   el.dataset.done = "1";
   const draw = () => { el.innerHTML = take(type, f, 0, WANT).map(x => card(x)).join(""); };
   draw();
-  for (let i = 0; i < 3; i++) {
-    if (take(type, f, 0, WANT).length >= WANT) break;
-    if (!(await pull(type, f, WANT))) break;
-    draw();
+  for (let i = 0; i < 4; i++) {
+    const added = await pull(type, f, WANT);
+    if (added) draw(); else break;
   }
   if (!el.children.length) {
     el.innerHTML = `<div class="fail"><span>Couldn't load this row.</span>
@@ -1407,18 +1408,19 @@ function renderBrowse(type, preset) {
     const g0 = bs.gen, f = F();
     for (let i = 0; i < 4; i++) {
       if (filtered(bs.type, f).length >= bs.shown) break;
-      if (!(await pull(bs.type, f, bs.shown))) break;
+      const added = await pull(bs.type, f, bs.shown);
       if (g0 !== bs.gen) { bs.busy = false; return; }
+      if (!added) break;
     }
     bs.busy = false;
     if (g0 !== bs.gen) return;
     const items = take(bs.type, f, 0, bs.shown), g = $("#bg");
-    if (g && items.length) g.innerHTML = items.map(x => card(x)).join("");
+    if (g) g.innerHTML = items.length ? items.map(x => card(x)).join("") : g.innerHTML;
     const m = $("#bm");
     if (m) {
       const total = filtered(bs.type, f).length;
       m.innerHTML = total > items.length ? `<button class="btn sm" id="bMore">Load more</button>`
-        : `<span class="count">That's the lot for now.</span>`;
+        : `<span class="count">${total ? "That's the lot for now." : "Reaching…"}</span>`;
       const b = $("#bMore"); if (b) b.onclick = () => { bs.shown += 42; paint(); };
     }
   };
@@ -1534,7 +1536,6 @@ async function openDetail(id, type, autoplay) {
   const base = itemCache.get(id) || lib[type].find(x => x.id === id) || { id, type, name:"Untitled" };
   meta = { ...base };
 
-  /* enrich series from TVMaze */
   let episodes = [], seasons = [];
   if (type === "series") {
     try {
